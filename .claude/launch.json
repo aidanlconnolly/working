@@ -1,0 +1,131 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "World Cup Bracket",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["World Cup Bracket Picker/server.py"],
+      "port": 3000
+    },
+    {
+      "name": "pga-tracker",
+      "runtimeExecutable": "/opt/homebrew/bin/node",
+      "runtimeArgs": ["PGA Championship Tracker/node_modules/.bin/vite", "--port", "5173"],
+      "port": 5173
+    },
+    {
+      "name": "tower-defense",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["Tower defense game/server.py"],
+      "port": 5200
+    },
+    {
+      "name": "startup-ideas",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd 'Startup Idea Generator' && python3 server.py"],
+      "port": 5051
+    },
+    {
+      "name": "finance-tracker",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd 'personal-finance-tracker' && /opt/homebrew/bin/node node_modules/.bin/vite --port 5174"],
+      "port": 5174
+    },
+    {
+      "name": "penalty-shootout",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd 'Penalty shootout' && python3 -m http.server 5300"],
+      "port": 5300
+    },
+    {
+      "name": "amex-credits",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd 'Amex Credits Maximizer' && /opt/homebrew/bin/node node_modules/.bin/vite --port 5175"],
+      "port": 5175
+    },
+    {
+      "name": "travel-app",
+      "runtimeExecutable": "/opt/homebrew/bin/node",
+      "runtimeArgs": ["/Users/aidanconnolly/Desktop/Projects/Working/travel-app/server.js"],
+      "port": 5400
+    },
+    {
+      "name": "personal-doctor",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd 'Personal Doctor' && /opt/homebrew/bin/node node_modules/.bin/vite --port 5177"],
+      "port": 5177
+    },
+    {
+      "name": "learn-claude-code",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd 'Learn Claude Code' && python3 -m http.server 5500"],
+      "port": 5500
+    },
+    {
+      "name": "italian-tutor",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd italian-tutor && /opt/homebrew/bin/node node_modules/.bin/next dev --port 5600"],
+      "port": 5600
+    },
+    {
+      "name": "french-tutor",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd french-tutor && /opt/homebrew/bin/node node_modules/.bin/next dev --port 5650"],
+      "port": 5650
+    },
+    {
+      "name": "rankings",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd /tmp/rankings-preview && python3 -m http.server 5700"],
+      "port": 5700
+    },
+    {
+      "name": "stadium-run",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd /tmp/stadium-run && python3 -m http.server 5350"],
+      "port": 5350
+    },
+    {
+      "name": "golf-swing",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd 'Golf swing assessor' && python3 -m http.server 5800"],
+      "port": 5800
+    },
+    {
+      "name": "history-platform",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd 'History Learning Platform' && /opt/homebrew/bin/node node_modules/.bin/vite --port 5750"],
+      "port": 5750
+    },
+    {
+      "name": "career-explorer",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd 'Post-MBA Career Explorer' && /opt/homebrew/bin/node node_modules/.bin/vite --port 5250"],
+      "port": 5250
+    },
+    {
+      "name": "language-tutor",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd language-tutor && /opt/homebrew/bin/node node_modules/.bin/next dev --port 5620"],
+      "port": 5620
+    },
+    {
+      "name": "famous-quotes",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd 'Famous Quotes' && /opt/homebrew/bin/node node_modules/.bin/vite --port 5850"],
+      "port": 5850
+    },
+    {
+      "name": "foundry",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd foundry && /opt/homebrew/bin/node node_modules/.bin/next dev --port 5900"],
+      "port": 5900
+    },
+    {
+      "name": "looper",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd looper-golf && PATH=/opt/homebrew/bin:$PATH npx expo start --web --port 8082"],
+      "port": 8082
+    }
+  ]
+}

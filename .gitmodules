@@ -1,0 +1,75 @@
+[submodule "Amex Credits Maximizer"]
+	path = Amex Credits Maximizer
+	url = https://github.com/aidanlconnolly/amex-credits-maximizer.git
+[submodule "Dream Career Picker"]
+	path = Dream Career Picker
+	url = https://github.com/aidanlconnolly/dream-career-picker.git
+[submodule "Famous Quotes"]
+	path = Famous Quotes
+	url = https://github.com/aidanlconnolly/famous-quotes.git
+[submodule "Golf range"]
+	path = Golf range
+	url = https://github.com/aidanlconnolly/golf-range.git
+[submodule "Golf swing assessor"]
+	path = Golf swing assessor
+	url = https://github.com/aidanlconnolly/golf-swing-assessor.git
+[submodule "Google extensions"]
+	path = Google extensions
+	url = https://github.com/aidanlconnolly/google-extensions.git
+[submodule "History Learning Platform"]
+	path = History Learning Platform
+	url = https://github.com/aidanlconnolly/history-learning-platform.git
+[submodule "Learn Claude Code"]
+	path = Learn Claude Code
+	url = https://github.com/aidanlconnolly/learn-claude-code.git
+[submodule "PGA Championship Tracker"]
+	path = PGA Championship Tracker
+	url = https://github.com/aidanlconnolly/pga-championship-tracker.git
+[submodule "Penalty shootout"]
+	path = Penalty shootout
+	url = https://github.com/aidanlconnolly/penalty-shootout.git
+[submodule "Personal Doctor"]
+	path = Personal Doctor
+	url = https://github.com/aidanlconnolly/personal-doctor.git
+[submodule "Post-MBA Career Explorer"]
+	path = Post-MBA Career Explorer
+	url = https://github.com/aidanlconnolly/post-mba-career-explorer.git
+[submodule "Stadium Run"]
+	path = Stadium Run
+	url = https://github.com/aidanlconnolly/stadium-run.git
+[submodule "Startup Idea Generator"]
+	path = Startup Idea Generator
+	url = https://github.com/aidanlconnolly/startup-idea-generator.git
+[submodule "Tower defense game"]
+	path = Tower defense game
+	url = https://github.com/aidanlconnolly/tower-defense-game.git
+[submodule "World Cup Bracket Picker"]
+	path = World Cup Bracket Picker
+	url = https://github.com/aidanlconnolly/world-cup-bracket-picker.git
+[submodule "date-app"]
+	path = date-app
+	url = https://github.com/aidanlconnolly/date-app.git
+[submodule "foundry"]
+	path = foundry
+	url = https://github.com/aidanlconnolly/foundry.git
+[submodule "french-tutor"]
+	path = french-tutor
+	url = https://github.com/aidanlconnolly/french-tutor.git
+[submodule "italian-tutor"]
+	path = italian-tutor
+	url = https://github.com/aidanlconnolly/italian-tutor.git
+[submodule "language-tutor"]
+	path = language-tutor
+	url = https://github.com/aidanlconnolly/language-tutor.git
+[submodule "looper-golf"]
+	path = looper-golf
+	url = https://github.com/aidanlconnolly/looper-golf.git
+[submodule "personal-finance-tracker"]
+	path = personal-finance-tracker
+	url = https://github.com/aidanlconnolly/personal-finance-tracker.git
+[submodule "quant-stock-trading"]
+	path = quant-stock-trading
+	url = https://github.com/aidanlconnolly/quant-stock-trading.git
+[submodule "travel-app"]
+	path = travel-app
+	url = https://github.com/aidanlconnolly/travel-app.git

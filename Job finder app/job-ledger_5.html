@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Job Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  body { font-family: 'Fraunces', Georgia, serif; background: #f5f1ea; color: #1a1a1a; margin: 0; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .ico { display: inline-block; width: 1em; height: 1em; vertical-align: -0.125em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spin { animation: spin 1s linear infinite; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useCallback } = React;
+
+// =============================================================================
+// Inline icon components (keeps everything offline-friendly, no lucide CDN dep)
+// =============================================================================
+const Icon = ({ d, size = 14, fill = "none", className = "", style = {} }) => (
+  <svg className={`ico ${className}`} style={{ width: size, height: size, ...style }} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    {d}
+  </svg>
+);
+const Search = (p) => <Icon {...p} d={<><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></>} />;
+const RefreshCw = (p) => <Icon {...p} d={<><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></>} />;
+const Bookmark = (p) => <Icon {...p} d={<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>} />;
+const X = (p) => <Icon {...p} d={<><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>} />;
+const ExternalLink = (p) => <Icon {...p} d={<><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></>} />;
+const Filter = (p) => <Icon {...p} d={<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>} />;
+const Share2 = (p) => <Icon {...p} d={<><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></>} />;
+const Plus = (p) => <Icon {...p} d={<><path d="M5 12h14"/><path d="M12 5v14"/></>} />;
+const Trash2 = (p) => <Icon {...p} d={<><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></>} />;
+const Building2 = (p) => <Icon {...p} d={<><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></>} />;
+const MapPin = (p) => <Icon {...p} d={<><path d="M20 10c0 7-8 13-8 13s-8-6-8-13a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></>} />;
+const Clock = (p) => <Icon {...p} d={<><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>} />;
+const Check = (p) => <Icon {...p} d={<polyline points="20 6 9 17 4 12"/>} />;
+const Copy = (p) => <Icon {...p} d={<><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></>} />;
+const ChevronDown = (p) => <Icon {...p} d={<polyline points="6 9 12 15 18 9"/>} />;
+const ChevronUp = (p) => <Icon {...p} d={<polyline points="18 15 12 9 6 15"/>} />;
+const AlertTriangle = (p) => <Icon {...p} d={<><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></>} />;
+const Zap = (p) => <Icon {...p} d={<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>} />;
+
+// =============================================================================
+// COMPANY DATABASE
+// =============================================================================
+const INDUSTRIES = [
+  { id: "tech", label: "Tech & Software" },
+  { id: "ai", label: "AI / ML" },
+  { id: "fintech", label: "Fintech" },
+  { id: "finance", label: "Financial Services" },
+  { id: "consulting", label: "Consulting" },
+  { id: "healthcare", label: "Healthcare & Biotech" },
+  { id: "consumer", label: "Consumer & Retail" },
+  { id: "fashion", label: "Fashion & Beauty" },
+  { id: "media", label: "Media & Entertainment" },
+  { id: "realestate", label: "Real Estate & PropTech" },
+  { id: "climate", label: "Energy & Climate" },
+  { id: "industrial", label: "Industrial & Logistics" },
+  { id: "education", label: "Education" },
+  { id: "other", label: "Other" },
+];
+
+const JOB_TYPES = [
+  { id: "fulltime", label: "Full-time" },
+  { id: "parttime", label: "Part-time" },
+  { id: "internship", label: "Internship" },
+  { id: "contract", label: "Contract / Seasonal" },
+];
+
+const FUNCTIONS = [
+  { id: "product", label: "Product" },
+  { id: "strategy", label: "Strategy / Corp Dev" },
+  { id: "biz_ops", label: "BizOps / Chief of Staff" },
+  { id: "consulting", label: "Consulting" },
+  { id: "finance", label: "Finance / FP&A" },
+  { id: "banking", label: "IB / PE / VC" },
+  { id: "marketing", label: "Marketing" },
+  { id: "sales", label: "Sales / GTM" },
+  { id: "data", label: "Data / Analytics" },
+  { id: "operations", label: "Operations" },
+  { id: "people", label: "People / HR" },
+  { id: "design", label: "Design" },
+  { id: "engineering", label: "Engineering" },
+  { id: "legal", label: "Legal" },
+];
+
+const FUNCTION_KEYWORDS = {
+  product: ["product manager", "product management", "group product", "principal product", "senior product", "head of product", "director of product", "product lead", "product owner", "associate product manager", "apm"],
+  strategy: ["strategy", "corporate development", "corp dev", "strategic finance", "business development", "biz dev", "strategic operations", "corporate strategy", "strategic partnerships"],
+  biz_ops: ["business operations", "biz ops", "chief of staff", "go-to-market strategy", "revenue operations", "rev ops", "strategy & operations", "strategy and operations"],
+  consulting: ["consultant", "consulting", "advisory", "engagement manager", "associate consultant"],
+  finance: ["fp&a", "fpa", "financial planning", "finance manager", "finance analyst", "financial analyst", "treasury", "investor relations", "controller", "accounting", "strategic finance", "business finance", "revenue analyst", "decision support", "growth finance", "finance associate", "finance lead", "senior associate, finance", "finance director", "head of finance"],
+  banking: ["investment banking", "private equity", "venture capital", "investment associate", "investment analyst", "portfolio manager", "deal team"],
+  marketing: ["marketing", "brand", "content marketing", "growth marketing", "performance marketing", "lifecycle marketing", "demand gen", "communications", "pr manager", "social media", "brand manager", "brand director", "marketing manager", "marketing analyst", "marketing associate", "marketing coordinator", "marketing specialist", "product marketing", "field marketing", "creative strategist", "content strategist", "influencer", "partnerships marketing", "email marketing", "seo", "sem", "paid media", "paid social", "crm marketing", "retention marketing", "acquisition marketing", "customer marketing"],
+  sales: ["account executive", "account manager", "sales", "business development representative", "bdr", "sdr", "customer success", "partnerships manager"],
+  data: ["data scientist", "data analyst", "analytics", "business intelligence", "data engineer", "machine learning", "research scientist"],
+  operations: ["operations manager", "supply chain", "logistics", "fulfillment", "program manager", "project manager"],
+  people: ["recruiter", "talent", "people operations", "hr business partner", "people partner", "hrbp", "human resources"],
+  design: ["designer", "ux", "user experience", "product design", "visual design", "brand design", "creative director"],
+  engineering: ["software engineer", "engineering manager", "tech lead", "staff engineer", "senior engineer", "frontend", "backend", "fullstack", "platform engineer", "devops", "site reliability", "sre"],
+  legal: ["counsel", "legal", "compliance", "paralegal", "attorney"],
+};
+
+// Greenhouse and Lever both serve permissive CORS on their public job-board GETs,
+// which work fine when this file is loaded from disk (file://) or any local origin.
+const COMPANIES = [
+  // Tech & Software
+  { name: "Figma", ats: "greenhouse", slug: "figma", industry: "tech" },
+  { name: "Notion", ats: "greenhouse", slug: "notion", industry: "tech" },
+  { name: "Airtable", ats: "greenhouse", slug: "airtable", industry: "tech" },
+  { name: "Vercel", ats: "greenhouse", slug: "vercel", industry: "tech" },
+  { name: "Retool", ats: "greenhouse", slug: "retool", industry: "tech" },
+  { name: "Coda", ats: "greenhouse", slug: "coda", industry: "tech" },
+  { name: "Zapier", ats: "greenhouse", slug: "zapier", industry: "tech" },
+  { name: "Webflow", ats: "greenhouse", slug: "webflow", industry: "tech" },
+  { name: "GitLab", ats: "greenhouse", slug: "gitlab", industry: "tech" },
+  { name: "HashiCorp", ats: "greenhouse", slug: "hashicorp", industry: "tech" },
+  { name: "MongoDB", ats: "greenhouse", slug: "mongodb", industry: "tech" },
+  { name: "Datadog", ats: "greenhouse", slug: "datadog", industry: "tech" },
+  { name: "Snowflake", ats: "greenhouse", slug: "snowflake", industry: "tech" },
+  { name: "Asana", ats: "greenhouse", slug: "asana", industry: "tech" },
+  { name: "Atlassian", ats: "lever", slug: "atlassian", industry: "tech" },
+  { name: "DigitalOcean", ats: "greenhouse", slug: "digitalocean", industry: "tech" },
+  { name: "Cloudflare", ats: "greenhouse", slug: "cloudflare", industry: "tech" },
+  { name: "Twilio", ats: "greenhouse", slug: "twilio", industry: "tech" },
+  { name: "Okta", ats: "greenhouse", slug: "okta", industry: "tech" },
+  { name: "Airbnb", ats: "greenhouse", slug: "airbnb", industry: "tech" },
+  { name: "Lyft", ats: "greenhouse", slug: "lyft", industry: "tech" },
+  { name: "Uber", ats: "greenhouse", slug: "uber", industry: "tech" },
+  { name: "Yelp", ats: "greenhouse", slug: "yelp", industry: "tech" },
+  { name: "Eventbrite", ats: "greenhouse", slug: "eventbrite", industry: "tech" },
+
+  // AI / ML
+  { name: "Anthropic", ats: "greenhouse", slug: "anthropic", industry: "ai" },
+  { name: "OpenAI", ats: "greenhouse", slug: "openai", industry: "ai" },
+  { name: "Hugging Face", ats: "lever", slug: "huggingface", industry: "ai" },
+  { name: "Databricks", ats: "greenhouse", slug: "databricks", industry: "ai" },
+  { name: "Writer", ats: "greenhouse", slug: "writer", industry: "ai" },
+  { name: "Glean", ats: "greenhouse", slug: "gleanwork", industry: "ai" },
+  { name: "Hebbia", ats: "greenhouse", slug: "hebbia", industry: "ai" },
+  { name: "Cresta", ats: "greenhouse", slug: "cresta", industry: "ai" },
+  { name: "Sourcegraph", ats: "greenhouse", slug: "sourcegraph91", industry: "ai" },
+  { name: "ClickHouse", ats: "greenhouse", slug: "clickhouse", industry: "tech" },
+  { name: "Cohere Health", ats: "greenhouse", slug: "coherehealth", industry: "healthcare" },
+
+  // Fintech
+  { name: "Stripe", ats: "greenhouse", slug: "stripe", industry: "fintech" },
+  { name: "Brex", ats: "greenhouse", slug: "brex", industry: "fintech" },
+  { name: "Plaid", ats: "lever", slug: "plaid", industry: "fintech" },
+  { name: "Chime", ats: "greenhouse", slug: "chime", industry: "fintech" },
+  { name: "Affirm", ats: "greenhouse", slug: "affirm", industry: "fintech" },
+  { name: "Robinhood", ats: "greenhouse", slug: "robinhood", industry: "fintech" },
+  { name: "Klarna", ats: "lever", slug: "klarna", industry: "fintech" },
+  { name: "Wise", ats: "greenhouse", slug: "wise", industry: "fintech" },
+  { name: "Marqeta", ats: "greenhouse", slug: "marqeta", industry: "fintech" },
+  { name: "Coinbase", ats: "greenhouse", slug: "coinbase", industry: "fintech" },
+  { name: "Gemini", ats: "greenhouse", slug: "gemini", industry: "fintech" },
+  { name: "SoFi", ats: "greenhouse", slug: "sofi", industry: "fintech" },
+  { name: "Carta", ats: "greenhouse", slug: "carta", industry: "fintech" },
+  { name: "Gusto", ats: "greenhouse", slug: "gusto", industry: "fintech" },
+  { name: "Square (Block)", ats: "greenhouse", slug: "square", industry: "fintech" },
+  { name: "Toast", ats: "greenhouse", slug: "toast", industry: "fintech" },
+
+  // Financial Services
+  { name: "Bridgewater", ats: "greenhouse", slug: "bridgewaterassociates", industry: "finance" },
+  { name: "Citadel", ats: "greenhouse", slug: "citadel", industry: "finance" },
+  { name: "Two Sigma", ats: "greenhouse", slug: "twosigma", industry: "finance" },
+  { name: "Jane Street", ats: "greenhouse", slug: "janestreet", industry: "finance" },
+  { name: "Hudson River Trading", ats: "greenhouse", slug: "wehackthefuture", industry: "finance" },
+  { name: "DRW", ats: "greenhouse", slug: "drweng", industry: "finance" },
+  { name: "Point72", ats: "greenhouse", slug: "point72", industry: "finance" },
+  { name: "Susquehanna", ats: "greenhouse", slug: "susquehannainternationalgroup", industry: "finance" },
+  { name: "Jump Trading", ats: "greenhouse", slug: "jumptrading", industry: "finance" },
+  { name: "Optiver", ats: "greenhouse", slug: "optiver", industry: "finance" },
+  { name: "Wealthfront", ats: "greenhouse", slug: "wealthfront", industry: "finance" },
+  { name: "Betterment", ats: "greenhouse", slug: "betterment", industry: "finance" },
+  { name: "AQR Capital", ats: "greenhouse", slug: "aqrcapitalmanagementllc", industry: "finance" },
+  { name: "Millennium", ats: "greenhouse", slug: "millennium", industry: "finance" },
+  { name: "Balyasny", ats: "greenhouse", slug: "balyasnyassetmanagement", industry: "finance" },
+  { name: "Squarepoint Capital", ats: "greenhouse", slug: "squarepoint", industry: "finance" },
+  { name: "IMC Trading", ats: "greenhouse", slug: "imc", industry: "finance" },
+  { name: "Belvedere Trading", ats: "greenhouse", slug: "belvederetradingllc", industry: "finance" },
+  { name: "Old Mission", ats: "greenhouse", slug: "oldmissioncapital", industry: "finance" },
+  { name: "Wolverine Trading", ats: "greenhouse", slug: "wolverinetrading", industry: "finance" },
+  { name: "Ramp", ats: "greenhouse", slug: "ramp", industry: "fintech" },
+  { name: "Mercury", ats: "greenhouse", slug: "mercury", industry: "fintech" },
+  { name: "Pipe", ats: "greenhouse", slug: "pipe", industry: "fintech" },
+  { name: "Modern Treasury", ats: "greenhouse", slug: "moderntreasury", industry: "fintech" },
+  { name: "Alloy", ats: "greenhouse", slug: "alloy", industry: "fintech" },
+
+  // Consulting
+  { name: "Slalom", ats: "greenhouse", slug: "slalom", industry: "consulting" },
+  { name: "Charles River Associates", ats: "greenhouse", slug: "charlesriverassociates", industry: "consulting" },
+  { name: "Cornerstone Research", ats: "greenhouse", slug: "cornerstoneresearch", industry: "consulting" },
+  { name: "Analysis Group", ats: "greenhouse", slug: "analysisgroup", industry: "consulting" },
+  { name: "Brattle Group", ats: "greenhouse", slug: "thebrattlegroup", industry: "consulting" },
+  { name: "L.E.K. Consulting", ats: "greenhouse", slug: "lekconsulting", industry: "consulting" },
+  { name: "ZS Associates", ats: "greenhouse", slug: "zsassociates", industry: "consulting" },
+  { name: "Guidehouse", ats: "greenhouse", slug: "guidehouse", industry: "consulting" },
+  { name: "FTI Consulting", ats: "greenhouse", slug: "fticonsulting", industry: "consulting" },
+
+  // Healthcare & Biotech
+  { name: "Oscar Health", ats: "greenhouse", slug: "oscar", industry: "healthcare" },
+  { name: "Cedar", ats: "greenhouse", slug: "cedar", industry: "healthcare" },
+  { name: "Hims & Hers", ats: "greenhouse", slug: "hims", industry: "healthcare" },
+  { name: "Ro", ats: "greenhouse", slug: "ro", industry: "healthcare" },
+  { name: "Headway", ats: "greenhouse", slug: "headway", industry: "healthcare" },
+  { name: "Devoted Health", ats: "greenhouse", slug: "devotedhealth", industry: "healthcare" },
+  { name: "Included Health", ats: "greenhouse", slug: "includedhealth", industry: "healthcare" },
+  { name: "Spring Health", ats: "greenhouse", slug: "springhealth", industry: "healthcare" },
+  { name: "Lyra Health", ats: "greenhouse", slug: "lyrahealth", industry: "healthcare" },
+  { name: "Tempus", ats: "greenhouse", slug: "tempus", industry: "healthcare" },
+  { name: "Flatiron Health", ats: "greenhouse", slug: "flatironhealth", industry: "healthcare" },
+  { name: "Ginkgo Bioworks", ats: "greenhouse", slug: "ginkgobioworks", industry: "healthcare" },
+  { name: "Recursion", ats: "greenhouse", slug: "recursion", industry: "healthcare" },
+  { name: "Verily", ats: "greenhouse", slug: "verily", industry: "healthcare" },
+  { name: "23andMe", ats: "greenhouse", slug: "23andme", industry: "healthcare" },
+  { name: "Cityblock Health", ats: "greenhouse", slug: "cityblockhealth", industry: "healthcare" },
+  { name: "Carbon Health", ats: "greenhouse", slug: "carbonhealth", industry: "healthcare" },
+
+  // Consumer & Retail
+  { name: "DoorDash", ats: "greenhouse", slug: "doordash", industry: "consumer" },
+  { name: "Instacart", ats: "greenhouse", slug: "instacart", industry: "consumer" },
+  { name: "Gopuff", ats: "greenhouse", slug: "gopuff", industry: "consumer" },
+  { name: "Faire", ats: "greenhouse", slug: "faire", industry: "consumer" },
+  { name: "Wayfair", ats: "greenhouse", slug: "wayfair", industry: "consumer" },
+  { name: "Etsy", ats: "greenhouse", slug: "etsy", industry: "consumer" },
+  { name: "Chewy", ats: "greenhouse", slug: "chewy", industry: "consumer" },
+  { name: "Allbirds", ats: "greenhouse", slug: "allbirds", industry: "consumer" },
+  { name: "Casper", ats: "greenhouse", slug: "casper", industry: "consumer" },
+  { name: "Warby Parker", ats: "greenhouse", slug: "warbyparker", industry: "consumer" },
+  { name: "Peloton", ats: "greenhouse", slug: "peloton", industry: "consumer" },
+  { name: "Whoop", ats: "greenhouse", slug: "whoop", industry: "consumer" },
+  { name: "Liquid Death", ats: "greenhouse", slug: "liquiddeath", industry: "consumer" },
+  { name: "Olipop", ats: "greenhouse", slug: "olipop", industry: "consumer" },
+  { name: "Caraway", ats: "greenhouse", slug: "carawayhome", industry: "consumer" },
+  { name: "Brooklinen", ats: "greenhouse", slug: "brooklinen", industry: "consumer" },
+
+  // Fashion & Beauty
+  { name: "Glossier", ats: "greenhouse", slug: "glossier", industry: "fashion" },
+  { name: "Sephora", ats: "greenhouse", slug: "sephora", industry: "fashion" },
+  { name: "Reformation", ats: "greenhouse", slug: "thereformation", industry: "fashion" },
+  { name: "Everlane", ats: "greenhouse", slug: "everlane", industry: "fashion" },
+  { name: "Rent the Runway", ats: "greenhouse", slug: "renttherunway", industry: "fashion" },
+  { name: "Stitch Fix", ats: "greenhouse", slug: "stitchfix", industry: "fashion" },
+  { name: "ThredUp", ats: "greenhouse", slug: "thredup", industry: "fashion" },
+  { name: "StockX", ats: "greenhouse", slug: "stockx", industry: "fashion" },
+  { name: "SSENSE", ats: "greenhouse", slug: "ssense", industry: "fashion" },
+  { name: "Lululemon", ats: "greenhouse", slug: "lululemon", industry: "fashion" },
+  { name: "Vuori", ats: "greenhouse", slug: "vuori", industry: "fashion" },
+  { name: "Mejuri", ats: "greenhouse", slug: "mejuri", industry: "fashion" },
+  { name: "ANINE BING", ats: "greenhouse", slug: "aninebing", industry: "fashion" },
+  { name: "Rebag", ats: "greenhouse", slug: "rebag", industry: "fashion" },
+  { name: "Fashion Nova", ats: "greenhouse", slug: "fashionnova", industry: "fashion" },
+  { name: "Quince", ats: "greenhouse", slug: "quince", industry: "fashion" },
+  { name: "Business of Fashion", ats: "greenhouse", slug: "businessoffashion", industry: "fashion" },
+  { name: "Trove (Recommerce)", ats: "greenhouse", slug: "trove", industry: "fashion" },
+  { name: "Madewell", ats: "greenhouse", slug: "madewell", industry: "fashion" },
+  { name: "Alo Yoga", ats: "greenhouse", slug: "aloyoga", industry: "fashion" },
+  { name: "Outdoor Voices", ats: "greenhouse", slug: "outdoorvoices", industry: "fashion" },
+  { name: "Universal Standard", ats: "greenhouse", slug: "universalstandard", industry: "fashion" },
+  { name: "Bombas", ats: "greenhouse", slug: "bombas", industry: "fashion" },
+  { name: "Parade", ats: "greenhouse", slug: "parade", industry: "fashion" },
+  { name: "Ilia Beauty", ats: "greenhouse", slug: "iliabeauty", industry: "fashion" },
+  { name: "Tatcha", ats: "greenhouse", slug: "tatcha", industry: "fashion" },
+  { name: "Goop", ats: "greenhouse", slug: "goop", industry: "fashion" },
+  { name: "Saks Fifth Avenue", ats: "greenhouse", slug: "saksoff5th", industry: "fashion" },
+  { name: "Faherty", ats: "greenhouse", slug: "fahertybrand", industry: "fashion" },
+
+  // Media & Entertainment
+  { name: "Spotify", ats: "lever", slug: "spotify", industry: "media" },
+  { name: "Discord", ats: "greenhouse", slug: "discord", industry: "media" },
+  { name: "Pinterest", ats: "greenhouse", slug: "pinterest", industry: "media" },
+  { name: "Reddit", ats: "greenhouse", slug: "reddit", industry: "media" },
+  { name: "Substack", ats: "greenhouse", slug: "substack", industry: "media" },
+  { name: "The New York Times", ats: "greenhouse", slug: "thenewyorktimes", industry: "media" },
+  { name: "The Atlantic", ats: "greenhouse", slug: "theatlantic", industry: "media" },
+  { name: "Bloomberg", ats: "greenhouse", slug: "bloomberg", industry: "media" },
+  { name: "Vox Media", ats: "greenhouse", slug: "voxmedia", industry: "media" },
+  { name: "Axios", ats: "greenhouse", slug: "axios", industry: "media" },
+  { name: "Hearst", ats: "greenhouse", slug: "hearst", industry: "media" },
+  { name: "Condé Nast", ats: "greenhouse", slug: "condenast", industry: "media" },
+  { name: "Roblox", ats: "greenhouse", slug: "roblox", industry: "media" },
+  { name: "Riot Games", ats: "greenhouse", slug: "riotgames", industry: "media" },
+  { name: "Epic Games", ats: "greenhouse", slug: "epicgames", industry: "media" },
+  { name: "Niantic", ats: "greenhouse", slug: "niantic", industry: "media" },
+  { name: "Patreon", ats: "greenhouse", slug: "patreon", industry: "media" },
+  { name: "SoundCloud", ats: "greenhouse", slug: "soundcloud", industry: "media" },
+
+  // Real Estate & PropTech
+  { name: "Compass", ats: "greenhouse", slug: "compass", industry: "realestate" },
+  { name: "Opendoor", ats: "greenhouse", slug: "opendoor", industry: "realestate" },
+  { name: "Redfin", ats: "greenhouse", slug: "redfin", industry: "realestate" },
+  { name: "Zillow", ats: "greenhouse", slug: "zillow", industry: "realestate" },
+  { name: "Sonder", ats: "greenhouse", slug: "sonder", industry: "realestate" },
+  { name: "Pacaso", ats: "greenhouse", slug: "pacaso", industry: "realestate" },
+  { name: "VTS", ats: "greenhouse", slug: "vts", industry: "realestate" },
+  { name: "Procore", ats: "greenhouse", slug: "procoretechnologies", industry: "realestate" },
+
+  // Energy & Climate
+  { name: "Rivian", ats: "greenhouse", slug: "rivian", industry: "climate" },
+  { name: "ChargePoint", ats: "greenhouse", slug: "chargepoint", industry: "climate" },
+  { name: "Sunrun", ats: "greenhouse", slug: "sunrun", industry: "climate" },
+  { name: "Aurora", ats: "greenhouse", slug: "aurorainnovation", industry: "climate" },
+  { name: "Crusoe", ats: "greenhouse", slug: "crusoeenergysystems", industry: "climate" },
+  { name: "Pachama", ats: "greenhouse", slug: "pachama", industry: "climate" },
+  { name: "Form Energy", ats: "greenhouse", slug: "formenergy", industry: "climate" },
+  { name: "Commonwealth Fusion", ats: "greenhouse", slug: "commonwealthfusionsystems", industry: "climate" },
+
+  // Industrial & Logistics
+  { name: "Anduril", ats: "greenhouse", slug: "anduril", industry: "industrial" },
+  { name: "Flexport", ats: "greenhouse", slug: "flexport", industry: "industrial" },
+  { name: "Samsara", ats: "greenhouse", slug: "samsara", industry: "industrial" },
+  { name: "ShipBob", ats: "greenhouse", slug: "shipbob", industry: "industrial" },
+  { name: "Stord", ats: "greenhouse", slug: "stord", industry: "industrial" },
+  { name: "Nuro", ats: "greenhouse", slug: "nuro", industry: "industrial" },
+  { name: "Zipline", ats: "greenhouse", slug: "zipline", industry: "industrial" },
+  { name: "Joby Aviation", ats: "greenhouse", slug: "jobyaviation", industry: "industrial" },
+  { name: "Archer Aviation", ats: "greenhouse", slug: "archeraviation", industry: "industrial" },
+  { name: "Relativity Space", ats: "greenhouse", slug: "relativityspace", industry: "industrial" },
+  { name: "Astranis", ats: "greenhouse", slug: "astranis", industry: "industrial" },
+
+  // Education
+  { name: "Coursera", ats: "greenhouse", slug: "coursera", industry: "education" },
+  { name: "Duolingo", ats: "greenhouse", slug: "duolingo", industry: "education" },
+  { name: "Quizlet", ats: "greenhouse", slug: "quizlet", industry: "education" },
+  { name: "Chegg", ats: "greenhouse", slug: "chegg", industry: "education" },
+  { name: "Khan Academy", ats: "greenhouse", slug: "khanacademy", industry: "education" },
+  { name: "Outschool", ats: "greenhouse", slug: "outschool", industry: "education" },
+  { name: "Handshake", ats: "greenhouse", slug: "joinhandshake", industry: "education" },
+  { name: "Articulate", ats: "greenhouse", slug: "articulate", industry: "education" },
+  { name: "Multiverse", ats: "greenhouse", slug: "multiverse", industry: "education" },
+
+  // Early-career program boards (full-time grad / rotational programs).
+  // These are dedicated greenhouse boards that aggregate a company's new-grad and
+  // associate roles in one place — useful for surfacing entry-level full-time work.
+  { name: "84.51° University Programs", ats: "greenhouse", slug: "8451university", industry: "tech" },
+  { name: "Loop", ats: "greenhouse", slug: "loop", industry: "tech" },
+  { name: "Wolt", ats: "greenhouse", slug: "wolt", industry: "consumer" },
+  { name: "NFL", ats: "greenhouse", slug: "nflcareers", industry: "media" },
+  { name: "mthree (Wiley)", ats: "greenhouse", slug: "mthreerecruitingportal", industry: "education" },
+  { name: "Marshall Wace (Tech Grad)", ats: "greenhouse", slug: "mw-tech-grad", industry: "finance" },
+  { name: "Marshall Wace (Internships)", ats: "greenhouse", slug: "mwinternshipprogram", industry: "finance" },
+];
+
+const COMPANIES_DEDUPED = Array.from(new Map(COMPANIES.map(c => [`${c.ats}:${c.slug}`, c])).values());
+
+const STORAGE_KEYS = {
+  companies: "jf:companies:v4",
+  saved: "jf:saved:v4",
+  dismissed: "jf:dismissed:v4",
+  filters: "jf:filters:v4",
+  jobs: "jf:jobs_cache:v4",
+  lastFetch: "jf:last_fetch:v4",
+  prunedSlugs: "jf:pruned_slugs:v4",
+};
+
+function lsGet(key, fallback) {
+  try {
+    const v = localStorage.getItem(key);
+    return v ? JSON.parse(v) : fallback;
+  } catch (e) { return fallback; }
+}
+function lsSet(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+}
+
+// =============================================================================
+// FETCHERS
+// =============================================================================
+
+// Decode HTML entities in case the API returns escaped HTML (e.g. &lt;p&gt;...).
+// Some Greenhouse boards (Glossier, etc.) return content where the HTML tags
+// have been entity-encoded, so doing innerHTML = html shows the literal tags.
+function decodeHtmlEntities(s) {
+  if (!s) return "";
+  // If it contains entity-encoded tags but no real ones, decode once.
+  if (/&lt;[a-z\/!]/i.test(s) && !/<[a-z\/!]/i.test(s)) {
+    const ta = document.createElement("textarea");
+    ta.innerHTML = s;
+    return ta.value;
+  }
+  return s;
+}
+
+// Extract a salary range from free-text description content. Greenhouse and
+// Lever both let companies write the comp band into the description; pay-
+// transparency laws (NYC, CA, WA, CO) mean most US tech roles include one.
+const SALARY_RX = [
+  // $120,000 - $150,000   /   $120K - $150K   /   $120,000 to $150,000
+  /\$\s?(\d{2,3}(?:,\d{3})?(?:\.\d+)?\s?[Kk]?)\s?(?:-|to|—|–)\s?\$?\s?(\d{2,3}(?:,\d{3})?(?:\.\d+)?\s?[Kk]?)/,
+  // 120K-150K
+  /(\d{2,3}\s?[Kk])\s?(?:-|to|—|–)\s?(\d{2,3}\s?[Kk])/,
+  // hourly: $18-$20 per hour
+  /\$\s?(\d{1,3}(?:\.\d+)?)\s?(?:-|to|—|–)\s?\$?\s?(\d{1,3}(?:\.\d+)?)\s?(?:\/|per\s)?(?:hr|hour)/i,
+];
+function extractSalary(htmlOrText) {
+  if (!htmlOrText) return null;
+  const tmp = document.createElement("div");
+  tmp.innerHTML = decodeHtmlEntities(htmlOrText);
+  const text = (tmp.textContent || tmp.innerText || "").replace(/\s+/g, " ");
+  for (const rx of SALARY_RX) {
+    const m = text.match(rx);
+    if (m) {
+      const isHourly = /hr|hour/i.test(m[0]);
+      // Convert each captured token into a number of dollars per year (or per hour for hourly).
+      const toNum = (raw) => {
+        const s = String(raw).replace(/\s/g, "");
+        if (/k$/i.test(s)) return parseFloat(s.replace(/k/i, "").replace(/,/g, "")) * 1000;
+        return parseFloat(s.replace(/,/g, ""));
+      };
+      const lo = toNum(m[1]);
+      const hi = toNum(m[2]);
+      const fmt = (n) => {
+        if (isHourly) return "$" + (n % 1 === 0 ? n : n.toFixed(2));
+        if (n >= 1000) return "$" + Math.round(n / 1000) + "K";
+        return "$" + n + "K";
+      };
+      return {
+        display: `${fmt(lo)}–${fmt(hi)}${isHourly ? "/hr" : ""}`,
+        max: hi,             // top of range, used by the salary filter
+        isHourly,            // hourly roles are excluded from the salary filter
+      };
+    }
+  }
+  return null;
+}
+
+// Infer employment type from job title + Greenhouse metadata.
+function inferJobType(title, metadata) {
+  const t = (title || "").toLowerCase();
+  if (/\bintern(ship)?\b|\bco-?op\b|\bsummer associate\b|\bsummer analyst\b/.test(t)) return "internship";
+  if (/\bpart[\s-]?time\b/.test(t)) return "parttime";
+  if (/\bcontract(or)?\b|\btemporary\b|\bseasonal\b|\bfreelance\b/.test(t)) return "contract";
+  // Greenhouse exposes employment_type in metadata for some boards.
+  if (Array.isArray(metadata)) {
+    for (const m of metadata) {
+      const v = String(m?.value || "").toLowerCase();
+      if (/intern/.test(v)) return "internship";
+      if (/part[\s-]?time/.test(v)) return "parttime";
+      if (/contract|temp|seasonal/.test(v)) return "contract";
+      if (/full[\s-]?time/.test(v)) return "fulltime";
+    }
+  }
+  return "fulltime";
+}
+
+async function fetchGreenhouse(company) {
+  const url = `https://boards-api.greenhouse.io/v1/boards/${company.slug}/jobs?content=true`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} (slug "${company.slug}" may be wrong)`);
+  const data = await res.json();
+  return (data.jobs || []).map(j => {
+    const decoded = decodeHtmlEntities(j.content || "");
+    return {
+      id: `gh-${company.slug}-${j.id}`,
+      title: j.title,
+      company: company.name,
+      industry: company.industry,
+      location: j.location?.name || "—",
+      url: j.absolute_url,
+      department: j.departments?.[0]?.name || "",
+      contentHtml: decoded,
+      salary: extractSalary(decoded),
+      jobType: inferJobType(j.title, j.metadata),
+      postedAt: j.updated_at || null,
+      source: "Greenhouse",
+    };
+  });
+}
+
+async function fetchLever(company) {
+  const url = `https://api.lever.co/v0/postings/${company.slug}?mode=json`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} (slug "${company.slug}" may be wrong)`);
+  const data = await res.json();
+  return (data || []).map(j => {
+    const desc = (j.descriptionPlain || j.description || "").slice(0, 1200);
+    return {
+      id: `lv-${company.slug}-${j.id}`,
+      title: j.text,
+      company: company.name,
+      industry: company.industry,
+      location: j.categories?.location || "—",
+      url: j.hostedUrl,
+      department: j.categories?.team || "",
+      contentHtml: desc,
+      salary: extractSalary(desc),
+      jobType: (() => {
+        const c = (j.categories?.commitment || "").toLowerCase();
+        if (/intern/.test(c)) return "internship";
+        if (/part/.test(c)) return "parttime";
+        if (/contract|temp/.test(c)) return "contract";
+        return inferJobType(j.text, null);
+      })(),
+      postedAt: j.createdAt ? new Date(j.createdAt).toISOString() : null,
+      source: "Lever",
+    };
+  });
+}
+
+async function fetchCompany(company) {
+  try {
+    let jobs = [];
+    if (company.ats === "greenhouse") jobs = await fetchGreenhouse(company);
+    else if (company.ats === "lever") jobs = await fetchLever(company);
+    else return { jobs: [], error: `Unsupported ATS: ${company.ats}`, is404: false };
+    return { jobs, error: null, is404: false };
+  } catch (e) {
+    const msg = e?.message || String(e);
+    const is404 = /HTTP 404/i.test(msg);
+    const friendly = /failed to fetch|networkerror|load failed/i.test(msg) ? "Network/CORS error" : msg;
+    return { jobs: [], error: friendly, is404 };
+  }
+}
+
+function summarize(html, maxChars = 220) {
+  if (!html) return "";
+  const tmp = document.createElement("div");
+  tmp.innerHTML = decodeHtmlEntities(html);
+  const text = (tmp.textContent || tmp.innerText || "").replace(/\s+/g, " ").trim();
+  const sentences = text.split(/(?<=[.!?])\s+/);
+  let out = "";
+  for (const s of sentences) {
+    if ((out + " " + s).length > maxChars) break;
+    out = out ? out + " " + s : s;
+    if (out.length > maxChars * 0.6 && /[.!?]$/.test(out)) break;
+  }
+  return out || text.slice(0, maxChars);
+}
+
+function matchesFunction(title, fnId) {
+  const kws = FUNCTION_KEYWORDS[fnId] || [];
+  const t = title.toLowerCase();
+  return kws.some(k => t.includes(k));
+}
+
+function matchesSeniority(title, level) {
+  const t = title.toLowerCase();
+  if (level === "any") return true;
+  if (level === "leadership") return /\b(director|vp|vice president|head of|chief|principal|partner)\b/.test(t);
+  if (level === "mid_senior") return /\b(senior|sr\.?|staff|lead|manager|mgr)\b/.test(t) && !/\b(director|vp|vice president|chief|head of|partner)\b/.test(t);
+  if (level === "mid") return !/\b(intern|junior|jr\.?|entry|new grad|director|vp|chief|head of|principal|partner)\b/.test(t) && !/\b(senior|sr\.?|staff|lead|head)\b/.test(t);
+  if (level === "early") {
+    // Early-career titles: must contain a clearly-junior signal AND not contain a clearly-senior one.
+    // Note: "manager" is allowed because "Associate Brand Manager" / "Associate Product Manager" are
+    // legitimate early-career titles — we exclude only un-prefixed "manager" via the senior-block.
+    const earlySignals = /\b(intern|associate|analyst|junior|jr\.?|entry[\s-]?level|new[\s-]?grad|graduate|early[\s-]?career|rotational|rotation|fellow(ship)?|trainee|apprentice|coordinator|assistant|specialist|campus|university|undergrad|apm|aam|amm|abm|residency|2026 grad|class of 2026|class of 2027)\b/;
+    const seniorBlock = /\b(senior|sr\.?|staff|principal|director|vp|vice president|head of|chief|partner|lead engineer|lead designer|lead pm|tech lead)\b/;
+    return earlySignals.test(t) && !seniorBlock.test(t);
+  }
+  return true;
+}
+
+function matchesLocation(loc, filter) {
+  if (filter === "any") return true;
+  const l = (loc || "").toLowerCase();
+  if (filter === "remote") return /remote|anywhere/.test(l);
+  if (filter === "us") {
+    return (/(united states|usa|u\.s\.|, [a-z]{2}\b|new york|san francisco|seattle|boston|chicago|austin|los angeles|nyc|sf|denver|miami|atlanta|washington|philadelphia|portland|nashville|raleigh|durham|houston|dallas|fort worth|san antonio)/.test(l) || /remote/.test(l))
+      && !/europe|emea|apac|london|berlin|paris|amsterdam|toronto|canada|india|tokyo|sydney|singapore|brazil|mexico|dublin/.test(l);
+  }
+  if (filter === "nyc") return /new york|nyc|, ny\b/.test(l);
+  if (filter === "sf") return /san francisco|, sf\b|bay area|palo alto|menlo park|mountain view/.test(l);
+  if (filter === "houston") return /houston/.test(l);
+  if (filter === "philly") return /philadelphia|philly|, pa\b/.test(l);
+  return true;
+}
+
+function encodeFiltersToHash(filters) {
+  try { return btoa(encodeURIComponent(JSON.stringify(filters))); } catch (e) { return ""; }
+}
+function decodeFiltersFromHash(hash) {
+  try {
+    const cleaned = (hash || "").replace(/^#/, "");
+    if (!cleaned) return null;
+    return JSON.parse(decodeURIComponent(atob(cleaned)));
+  } catch (e) { return null; }
+}
+
+function dedupeJobs(jobs) {
+  const seen = new Map();
+  for (const j of jobs) {
+    const key = `${j.company}::${(j.title || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim()}::${(j.location || "").toLowerCase().slice(0, 20)}`;
+    if (!seen.has(key)) seen.set(key, j);
+  }
+  return Array.from(seen.values());
+}
+
+// =============================================================================
+// MAIN APP
+// =============================================================================
+function JobFinder() {
+  const [companies, setCompanies] = useState(() => lsGet(STORAGE_KEYS.companies, COMPANIES_DEDUPED) || COMPANIES_DEDUPED);
+  const [prunedSlugs, setPrunedSlugs] = useState(() => lsGet(STORAGE_KEYS.prunedSlugs, {}) || {});
+  const [jobs, setJobs] = useState(() => lsGet(STORAGE_KEYS.jobs, []) || []);
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState({ done: 0, total: 0 });
+  const [fetchErrors, setFetchErrors] = useState([]);
+  const [lastFetch, setLastFetch] = useState(() => lsGet(STORAGE_KEYS.lastFetch, null));
+  const [saved, setSaved] = useState(() => lsGet(STORAGE_KEYS.saved, {}) || {});
+  const [dismissed, setDismissed] = useState(() => lsGet(STORAGE_KEYS.dismissed, {}) || {});
+  const [showAddCompany, setShowAddCompany] = useState(false);
+  const [showCompanyManager, setShowCompanyManager] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [filtersExpanded, setFiltersExpanded] = useState(true);
+  const [diagnostic, setDiagnostic] = useState(null);
+
+  const [filters, setFilters] = useState(() => {
+    const urlF = decodeFiltersFromHash(window.location.hash);
+    const stored = lsGet(STORAGE_KEYS.filters, null);
+    return { functions: [], industries: [], jobTypes: [], seniority: "any", location: "any", minSalary: 0, requireSalary: false, keyword: "", showSavedOnly: false, ...(stored || {}), ...(urlF || {}) };
+  });
+
+  useEffect(() => { lsSet(STORAGE_KEYS.filters, filters); }, [filters]);
+
+  const runDiagnostic = useCallback(async () => {
+    setDiagnostic({ ok: null, msg: "Testing Anthropic Greenhouse board…" });
+    const result = await fetchCompany({ name: "Anthropic", ats: "greenhouse", slug: "anthropic", industry: "ai" });
+    if (result.error) {
+      setDiagnostic({ ok: false, msg: `Test failed: ${result.error}.` });
+    } else {
+      setDiagnostic({ ok: true, msg: `Test succeeded: pulled ${result.jobs.length} jobs from Anthropic. Click Refresh to fetch all companies.` });
+    }
+  }, []);
+
+  const refreshJobs = useCallback(async () => {
+    setLoading(true);
+    // Skip slugs already pruned (returned 404 on a previous run).
+    const liveCompanies = companies.filter(c => !prunedSlugs[`${c.ats}:${c.slug}`]);
+    setProgress({ done: 0, total: liveCompanies.length });
+    setFetchErrors([]);
+    const all = [];
+    const errors = [];
+    const newPruned = { ...prunedSlugs };
+    let prunedThisRun = 0;
+    const batchSize = 8;
+    for (let i = 0; i < liveCompanies.length; i += batchSize) {
+      const batch = liveCompanies.slice(i, i + batchSize);
+      const results = await Promise.all(batch.map(fetchCompany));
+      results.forEach((r, idx) => {
+        if (r.error) {
+          errors.push({ name: batch[idx].name, reason: r.error });
+          // Auto-prune: 404 means the slug is wrong / company moved off Greenhouse-Lever.
+          // Don't prune transient network errors.
+          if (r.is404) {
+            newPruned[`${batch[idx].ats}:${batch[idx].slug}`] = { name: batch[idx].name, prunedAt: new Date().toISOString() };
+            prunedThisRun++;
+          }
+        } else {
+          all.push(...r.jobs);
+        }
+      });
+      setProgress({ done: Math.min(i + batchSize, liveCompanies.length), total: liveCompanies.length });
+      setFetchErrors([...errors]);
+    }
+    if (prunedThisRun > 0) {
+      setPrunedSlugs(newPruned);
+      lsSet(STORAGE_KEYS.prunedSlugs, newPruned);
+    }
+    const deduped = dedupeJobs(all);
+    setJobs(deduped);
+    const ts = new Date().toISOString();
+    setLastFetch(ts);
+    lsSet(STORAGE_KEYS.jobs, deduped);
+    lsSet(STORAGE_KEYS.lastFetch, ts);
+    setLoading(false);
+  }, [companies, prunedSlugs]);
+
+  const visibleJobs = useMemo(() => {
+    const kw = filters.keyword.toLowerCase().trim();
+    return jobs
+      .filter(j => !dismissed[j.id])
+      .filter(j => {
+        if (filters.showSavedOnly && !saved[j.id]) return false;
+        if (filters.functions.length > 0 && !filters.functions.some(fn => matchesFunction(j.title, fn))) return false;
+        if (filters.industries.length > 0 && !filters.industries.includes(j.industry)) return false;
+        if (filters.jobTypes && filters.jobTypes.length > 0 && !filters.jobTypes.includes(j.jobType || "fulltime")) return false;
+        if (!matchesSeniority(j.title, filters.seniority)) return false;
+        if (!matchesLocation(j.location, filters.location)) return false;
+        // Require-salary toggle: when on, hide any role that doesn't disclose a salary.
+        // Hourly roles count as disclosed (they have a band), so they're kept.
+        if (filters.requireSalary && !j.salary) return false;
+        // Min-salary filter: only applied when user picks a non-zero minimum.
+        // Hourly roles are excluded from this comparison since you can't compare $25/hr to $150K.
+        if (filters.minSalary > 0) {
+          if (!j.salary) {
+            // Already handled by requireSalary above. If requireSalary is off, we keep
+            // un-disclosed roles in results so the feed doesn't silently shrink by half.
+          } else if (j.salary.isHourly) {
+            // pass — hourly roles can't be compared to an annual minimum
+          } else if (j.salary.max < filters.minSalary) {
+            return false;
+          }
+        }
+        if (kw) {
+          const blob = `${j.title} ${j.company} ${j.location} ${j.department}`.toLowerCase();
+          if (!blob.includes(kw)) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (saved[a.id] && !saved[b.id]) return -1;
+        if (!saved[a.id] && saved[b.id]) return 1;
+        const da = a.postedAt ? new Date(a.postedAt).getTime() : 0;
+        const db = b.postedAt ? new Date(b.postedAt).getTime() : 0;
+        return db - da;
+      });
+  }, [jobs, filters, dismissed, saved]);
+
+  const toggleSave = (job) => {
+    const next = { ...saved };
+    if (next[job.id]) delete next[job.id];
+    else next[job.id] = { savedAt: new Date().toISOString(), title: job.title, company: job.company, url: job.url };
+    setSaved(next);
+    lsSet(STORAGE_KEYS.saved, next);
+  };
+
+  const dismissJob = (job) => {
+    const next = { ...dismissed, [job.id]: true };
+    setDismissed(next);
+    lsSet(STORAGE_KEYS.dismissed, next);
+  };
+
+  const toggleFunction = (id) => setFilters(f => ({ ...f, functions: f.functions.includes(id) ? f.functions.filter(x => x !== id) : [...f.functions, id] }));
+  const toggleIndustry = (id) => setFilters(f => ({ ...f, industries: f.industries.includes(id) ? f.industries.filter(x => x !== id) : [...f.industries, id] }));
+  const toggleJobType = (id) => setFilters(f => ({ ...f, jobTypes: (f.jobTypes || []).includes(id) ? (f.jobTypes || []).filter(x => x !== id) : [...(f.jobTypes || []), id] }));
+  const clearFilters = () => setFilters({ functions: [], industries: [], jobTypes: [], seniority: "any", location: "any", minSalary: 0, requireSalary: false, keyword: "", showSavedOnly: false });
+
+  const copyShareLink = async () => {
+    const hash = encodeFiltersToHash(filters);
+    const url = `${window.location.origin}${window.location.pathname}#${hash}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true); setTimeout(() => setCopied(false), 2000);
+    } catch (e) {
+      const ta = document.createElement("textarea");
+      ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+      setCopied(true); setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const copyJobLinks = async () => {
+    const text = visibleJobs.slice(0, 50).map(j => `${j.title} — ${j.company} (${j.location})\n${j.url}\n${summarize(j.contentHtml, 180)}\n`).join("\n");
+    try { await navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch (e) {}
+  };
+
+  const lastFetchLabel = useMemo(() => {
+    if (!lastFetch) return "Never";
+    const d = new Date(lastFetch);
+    const diffMs = Date.now() - d.getTime();
+    const diffMin = Math.round(diffMs / 60000);
+    if (diffMin < 1) return "Just now";
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffHr = Math.round(diffMin / 60);
+    if (diffHr < 24) return `${diffHr}h ago`;
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  }, [lastFetch]);
+
+  const savedCount = Object.keys(saved).length;
+  const activeFilterCount = filters.functions.length + filters.industries.length + (filters.jobTypes?.length || 0) + (filters.seniority !== "any" ? 1 : 0) + (filters.location !== "any" ? 1 : 0) + ((filters.minSalary || 0) > 0 ? 1 : 0) + (filters.requireSalary ? 1 : 0) + (filters.keyword ? 1 : 0) + (filters.showSavedOnly ? 1 : 0);
+
+  return (
+    <div className="min-h-screen w-full">
+      <header className="border-b" style={{ borderColor: "#1a1a1a", background: "#1a1a1a", color: "#f5f1ea" }}>
+        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-medium mt-1" style={{ letterSpacing: "-0.02em" }}>AI Job Finder</h1>
+          </div>
+          <div className="mono flex items-center gap-2 text-xs">
+            <Clock size={12} className="opacity-60" />
+            <span className="opacity-60">Last refresh:</span>
+            <span>{lastFetchLabel}</span>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <section className="mb-6">
+          <div className="flex flex-wrap items-center gap-2 mb-5">
+            <button onClick={refreshJobs} disabled={loading} className="mono inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium" style={{ background: "#1a1a1a", color: "#f5f1ea", letterSpacing: "0.02em", opacity: loading ? 0.7 : 1 }}>
+              <RefreshCw size={14} className={loading ? "spin" : ""} />
+              {loading ? `${progress.done}/${progress.total} companies` : "Refresh jobs"}
+            </button>
+            <button onClick={copyShareLink} className="mono inline-flex items-center gap-2 px-4 py-2.5 text-sm border" style={{ borderColor: "#1a1a1a" }}>
+              {copied ? <Check size={14} /> : <Share2 size={14} />}
+              {copied ? "Copied" : "Share filters"}
+            </button>
+            <button onClick={copyJobLinks} disabled={visibleJobs.length === 0} className="mono inline-flex items-center gap-2 px-4 py-2.5 text-sm border" style={{ borderColor: "#1a1a1a", opacity: visibleJobs.length === 0 ? 0.4 : 1 }}>
+              <Copy size={14} /> Copy {Math.min(visibleJobs.length, 50)} results
+            </button>
+          </div>
+
+          {diagnostic && (
+            <div className="mb-4 px-4 py-3 border flex items-start gap-3 text-sm" style={{
+              borderColor: diagnostic.ok === false ? "#a33" : diagnostic.ok === true ? "#1a1a1a" : "#1a1a1a40",
+              background: diagnostic.ok === false ? "#fdecec" : diagnostic.ok === true ? "#e8f3e0" : "#fffdf8"
+            }}>
+              {diagnostic.ok === false ? <AlertTriangle size={16} className="mt-0.5 shrink-0" style={{ color: "#a33" }} /> : <Check size={16} className="mt-0.5 shrink-0" />}
+              <span className="mono" style={{ fontSize: "13px" }}>{diagnostic.msg}</span>
+              <button onClick={() => setDiagnostic(null)} className="ml-auto opacity-50 hover:opacity-100"><X size={14} /></button>
+            </div>
+          )}
+
+          {fetchErrors.length > 0 && !loading && (() => {
+            const networkErrors = fetchErrors.filter(e => !/HTTP 404/i.test(e.reason));
+            const fourOhFours = fetchErrors.filter(e => /HTTP 404/i.test(e.reason));
+            // Hide entirely if every error was a 404 (those got auto-pruned silently).
+            if (networkErrors.length === 0 && fourOhFours.length === 0) return null;
+            return (
+              <div className="mb-4 px-4 py-3 border text-sm" style={{ borderColor: networkErrors.length > 0 ? "#a33" : "#1a1a1a40", background: networkErrors.length > 0 ? "#fdecec" : "#fffdf8" }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertTriangle size={14} style={{ color: networkErrors.length > 0 ? "#a33" : "#1a1a1a80" }} />
+                  <span className="mono font-medium">
+                    {networkErrors.length > 0 && <>{networkErrors.length} network error{networkErrors.length === 1 ? "" : "s"}</>}
+                    {networkErrors.length > 0 && fourOhFours.length > 0 && " · "}
+                    {fourOhFours.length > 0 && <>{fourOhFours.length} slug{fourOhFours.length === 1 ? "" : "s"} auto-pruned (404)</>}
+                  </span>
+                </div>
+                {fourOhFours.length > 0 && (
+                  <p className="mono text-xs opacity-60 mb-1">Pruned slugs are skipped on future refreshes. Restore them in the Companies panel.</p>
+                )}
+                {networkErrors.length > 0 && (
+                  <details>
+                    <summary className="mono text-xs opacity-70">? see which companies</summary>
+                    <div className="mono mt-2 text-xs opacity-70 max-h-32 overflow-y-auto">
+                      {networkErrors.map((e, i) => <div key={i}>{e.name}: {e.reason}</div>)}
+                    </div>
+                  </details>
+                )}
+              </div>
+            );
+          })()}
+
+          {loading && progress.total > 0 && (
+            <div className="mb-4 h-1 w-full" style={{ background: "#1a1a1a20" }}>
+              <div className="h-full transition-all" style={{ background: "#1a1a1a", width: `${(progress.done / progress.total) * 100}%` }}></div>
+            </div>
+          )}
+
+          <div className="border" style={{ borderColor: "#1a1a1a", background: "#fffdf8" }}>
+            <button onClick={() => setFiltersExpanded(v => !v)} className="w-full px-5 py-3 flex items-center justify-between text-left" style={{ borderBottom: filtersExpanded ? "1px solid #1a1a1a30" : "none" }}>
+              <div className="mono text-xs uppercase tracking-[0.2em] opacity-70 flex items-center gap-2">
+                <Filter size={11} /> Steer the results
+                {activeFilterCount > 0 && (<span className="px-1.5 py-0.5 text-[10px]" style={{ background: "#1a1a1a", color: "#f5f1ea" }}>{activeFilterCount} active</span>)}
+              </div>
+              <div className="flex items-center gap-3">
+                {activeFilterCount > 0 && (
+                  <span onClick={(e) => { e.stopPropagation(); clearFilters(); }} className="mono text-xs underline opacity-60 hover:opacity-100 cursor-pointer">clear all</span>
+                )}
+                {filtersExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </div>
+            </button>
+
+            {filtersExpanded && (
+              <div className="p-5 space-y-5">
+                <div>
+                  <label className="mono text-xs uppercase tracking-wider opacity-60 block mb-2">
+                    Job function {filters.functions.length > 0 && <span className="opacity-100">· {filters.functions.length} selected</span>}
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {FUNCTIONS.map(t => (
+                      <button key={t.id} onClick={() => toggleFunction(t.id)} className="mono px-2.5 py-1 text-xs border" style={{
+                        borderColor: "#1a1a1a",
+                        background: filters.functions.includes(t.id) ? "#1a1a1a" : "transparent",
+                        color: filters.functions.includes(t.id) ? "#f5f1ea" : "#1a1a1a",
+                      }}>{t.label}</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mono text-xs uppercase tracking-wider opacity-60 block mb-2">
+                    Industry {filters.industries.length > 0 && <span className="opacity-100">· {filters.industries.length} selected</span>}
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {INDUSTRIES.map(t => (
+                      <button key={t.id} onClick={() => toggleIndustry(t.id)} className="mono px-2.5 py-1 text-xs border" style={{
+                        borderColor: "#1a1a1a",
+                        background: filters.industries.includes(t.id) ? "#1a1a1a" : "transparent",
+                        color: filters.industries.includes(t.id) ? "#f5f1ea" : "#1a1a1a",
+                      }}>{t.label}</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mono text-xs uppercase tracking-wider opacity-60 block mb-2">
+                    Job type {(filters.jobTypes?.length || 0) > 0 && <span className="opacity-100">· {filters.jobTypes.length} selected</span>}
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {JOB_TYPES.map(t => (
+                      <button key={t.id} onClick={() => toggleJobType(t.id)} className="mono px-2.5 py-1 text-xs border" style={{
+                        borderColor: "#1a1a1a",
+                        background: (filters.jobTypes || []).includes(t.id) ? "#1a1a1a" : "transparent",
+                        color: (filters.jobTypes || []).includes(t.id) ? "#f5f1ea" : "#1a1a1a",
+                      }}>{t.label}</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <label className="mono text-xs uppercase tracking-wider opacity-60 block mb-2">Seniority</label>
+                    <select value={filters.seniority} onChange={e => setFilters(f => ({ ...f, seniority: e.target.value }))} className="mono w-full px-3 py-2 text-sm border bg-transparent" style={{ borderColor: "#1a1a1a" }}>
+                      <option value="any">Any level</option>
+                      <option value="early">Early career (Analyst / Associate, 0–3 yrs)</option>
+                      <option value="mid">Mid (3–6 yrs)</option>
+                      <option value="mid_senior">Senior IC / Manager (post-MBA typical)</option>
+                      <option value="leadership">Director+ / Leadership</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mono text-xs uppercase tracking-wider opacity-60 block mb-2">Location</label>
+                    <select value={filters.location} onChange={e => setFilters(f => ({ ...f, location: e.target.value }))} className="mono w-full px-3 py-2 text-sm border bg-transparent" style={{ borderColor: "#1a1a1a" }}>
+                      <option value="any">Anywhere</option>
+                      <option value="us">United States</option>
+                      <option value="nyc">NYC</option>
+                      <option value="sf">SF / Bay Area</option>
+                      <option value="houston">Houston</option>
+                      <option value="philly">Philadelphia</option>
+                      <option value="remote">Remote only</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mono text-xs uppercase tracking-wider opacity-60 block mb-2">Min. salary (top of range)</label>
+                    <select value={filters.minSalary || 0} onChange={e => setFilters(f => ({ ...f, minSalary: parseInt(e.target.value, 10) }))} className="mono w-full px-3 py-2 text-sm border bg-transparent" style={{ borderColor: "#1a1a1a" }}>
+                      <option value="0">Any</option>
+                      <option value="60000">$60K+</option>
+                      <option value="80000">$80K+</option>
+                      <option value="100000">$100K+</option>
+                      <option value="125000">$125K+</option>
+                      <option value="150000">$150K+</option>
+                      <option value="175000">$175K+</option>
+                      <option value="200000">$200K+</option>
+                      <option value="250000">$250K+</option>
+                      <option value="300000">$300K+</option>
+                    </select>
+                    <label className="mono inline-flex items-center gap-2 cursor-pointer text-xs mt-2 opacity-80">
+                      <input type="checkbox" checked={!!filters.requireSalary} onChange={e => setFilters(f => ({ ...f, requireSalary: e.target.checked }))} className="w-3.5 h-3.5" />
+                      Require disclosed salary
+                    </label>
+                  </div>
+                  <div>
+                    <label className="mono text-xs uppercase tracking-wider opacity-60 block mb-2">Keyword</label>
+                    <div className="relative">
+                      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 opacity-50" />
+                      <input type="text" value={filters.keyword} onChange={e => setFilters(f => ({ ...f, keyword: e.target.value }))} placeholder="e.g. fintech, growth, brand" className="mono w-full pl-9 pr-3 py-2 text-sm border bg-transparent" style={{ borderColor: "#1a1a1a" }} />
+                    </div>
+                  </div>
+                </div>
+
+                {(filters.minSalary > 0 || filters.requireSalary) && (
+                  <p className="mono text-xs opacity-60 -mt-2">
+                    {filters.requireSalary
+                      ? <>Showing only roles with a disclosed salary band.{filters.minSalary > 0 && <> Minimum top-of-band: ${(filters.minSalary / 1000).toFixed(0)}K.</>}</>
+                      : <>Roles whose disclosed top-of-band is at least ${(filters.minSalary / 1000).toFixed(0)}K. Roles without a disclosed salary still appear — toggle <em>Require disclosed salary</em> to hide them.</>
+                    }
+                  </p>
+                )}
+
+                <label className="mono inline-flex items-center gap-2 cursor-pointer text-sm">
+                  <input type="checkbox" checked={filters.showSavedOnly} onChange={e => setFilters(f => ({ ...f, showSavedOnly: e.target.checked }))} className="w-4 h-4" />
+                  Show saved only ({savedCount})
+                </label>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section>
+          <div className="flex items-baseline justify-between mb-5">
+            <h2 className="text-2xl font-medium" style={{ letterSpacing: "-0.01em" }}>
+              {visibleJobs.length.toLocaleString()} {visibleJobs.length === 1 ? "opening" : "openings"}
+            </h2>
+            {jobs.length > 0 && (
+              <div className="mono text-xs opacity-60">{jobs.length.toLocaleString()} total · {Object.keys(dismissed).length} dismissed</div>
+            )}
+          </div>
+
+          {jobs.length === 0 && !loading && (
+            <div className="border-2 border-dashed p-12 text-center" style={{ borderColor: "#1a1a1a40" }}>
+              <p className="text-lg mb-2">Welcome.</p>
+              <p className="opacity-70 mb-1 max-w-md mx-auto">Click <strong>Refresh jobs</strong> to pull live listings from {companies.length} companies.</p>
+              <p className="opacity-50 text-sm mt-2 max-w-md mx-auto">Expect 30–90 seconds. Slugs that 404 are auto-pruned, so the second refresh is faster.</p>
+            </div>
+          )}
+
+          <div className="space-y-3">
+            {visibleJobs.slice(0, 200).map(job => (
+              <JobCard key={job.id} job={job} isSaved={!!saved[job.id]} onSave={() => toggleSave(job)} onDismiss={() => dismissJob(job)} />
+            ))}
+            {visibleJobs.length > 200 && (
+              <div className="mono text-center py-6 text-sm opacity-60">Showing 200 of {visibleJobs.length.toLocaleString()}. Add filters to narrow down.</div>
+            )}
+          </div>
+        </section>
+
+        <footer className="mono mt-16 pt-8 border-t text-xs opacity-50" style={{ borderColor: "#1a1a1a40" }}>
+          <p>Sources: Greenhouse and Lever public job-board APIs. Apply links route directly to each company's posting.</p>
+          <p className="mt-1">Saved jobs and filters persist in this browser via localStorage. The Share-link button copies a URL with your filters baked in.</p>
+        </footer>
+      </main>
+    </div>
+  );
+}
+
+function JobCard({ job, isSaved, onSave, onDismiss }) {
+  const [expanded, setExpanded] = useState(false);
+  const summary = useMemo(() => summarize(job.contentHtml, 200), [job.contentHtml]);
+  const fullSummary = useMemo(() => summarize(job.contentHtml, 600), [job.contentHtml]);
+  const industryLabel = useMemo(() => INDUSTRIES.find(i => i.id === job.industry)?.label || job.industry, [job.industry]);
+  const postedLabel = useMemo(() => {
+    if (!job.postedAt) return null;
+    const d = new Date(job.postedAt);
+    const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+    if (days < 1) return "Today";
+    if (days === 1) return "1d";
+    if (days < 30) return `${days}d`;
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  }, [job.postedAt]);
+
+  return (
+    <article className="border p-5" style={{ borderColor: "#1a1a1a", background: isSaved ? "#fff5d6" : "#fffdf8" }}>
+      <div className="flex items-start gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-3 flex-wrap mb-1">
+            <h3 className="text-lg font-medium leading-tight" style={{ letterSpacing: "-0.01em" }}>{job.title}</h3>
+            {postedLabel && (<span className="mono text-xs opacity-50">{postedLabel}</span>)}
+          </div>
+          <div className="mono flex items-center gap-3 text-sm opacity-70 mb-3 flex-wrap">
+            <span className="flex items-center gap-1"><Building2 size={11} /> {job.company}</span>
+            <span className="flex items-center gap-1"><MapPin size={11} /> {job.location}</span>
+            {job.department && <span className="opacity-70">· {job.department}</span>}
+            <span className="px-1.5 py-0.5 text-[10px] uppercase tracking-wider" style={{ background: "#1a1a1a15", color: "#1a1a1a" }}>{industryLabel}</span>
+            {job.jobType && job.jobType !== "fulltime" && (
+              <span className="px-1.5 py-0.5 text-[10px] uppercase tracking-wider" style={{ background: "#1a1a1a", color: "#f5f1ea" }}>
+                {job.jobType === "parttime" ? "Part-time" : job.jobType === "internship" ? "Internship" : job.jobType === "contract" ? "Contract" : job.jobType}
+              </span>
+            )}
+            {job.salary && (
+              <span className="px-1.5 py-0.5 text-[10px] uppercase tracking-wider font-medium" style={{ background: "#1f4a1f", color: "#f5f1ea" }}>{job.salary.display}</span>
+            )}
+          </div>
+          {summary && (
+            <p className="text-sm leading-relaxed opacity-80">
+              {expanded ? fullSummary : summary}
+              {fullSummary.length > summary.length && (
+                <button onClick={() => setExpanded(v => !v)} className="mono ml-2 underline opacity-60 hover:opacity-100 text-xs">{expanded ? "less" : "more"}</button>
+              )}
+            </p>
+          )}
+        </div>
+        <div className="flex flex-col items-end gap-2 shrink-0">
+          <button onClick={onSave} title={isSaved ? "Unsave" : "Save"} className="p-2" style={{ color: isSaved ? "#1a1a1a" : "#1a1a1a80" }}>
+            <Bookmark size={16} fill={isSaved ? "#1a1a1a" : "none"} />
+          </button>
+          <button onClick={onDismiss} title="Dismiss" className="p-2 opacity-50"><X size={16} /></button>
+        </div>
+      </div>
+      <div className="mt-4 flex items-center justify-between">
+        <span className="mono text-xs opacity-50">via {job.source}</span>
+        <a href={job.url} target="_blank" rel="noopener noreferrer" className="mono inline-flex items-center gap-1.5 text-sm font-medium underline underline-offset-4">
+          Apply <ExternalLink size={12} />
+        </a>
+      </div>
+    </article>
+  );
+}
+
+function AddCompanyForm({ onAdd }) {
+  const [name, setName] = useState("");
+  const [ats, setAts] = useState("greenhouse");
+  const [slug, setSlug] = useState("");
+  const [industry, setIndustry] = useState("tech");
+
+  const submit = () => {
+    if (!name.trim() || !slug.trim()) return;
+    onAdd({ name: name.trim(), ats, slug: slug.trim().toLowerCase(), industry });
+    setName(""); setSlug("");
+  };
+
+  return (
+    <div className="border p-3 grid grid-cols-1 md:grid-cols-5 gap-2 items-end" style={{ borderColor: "#1a1a1a40", background: "#f5f1ea" }}>
+      <div>
+        <label className="mono text-xs opacity-60 block mb-1">Company</label>
+        <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Anthropic" className="w-full px-2 py-1.5 text-sm border bg-transparent" style={{ borderColor: "#1a1a1a" }} />
+      </div>
+      <div>
+        <label className="mono text-xs opacity-60 block mb-1">ATS</label>
+        <select value={ats} onChange={e => setAts(e.target.value)} className="w-full px-2 py-1.5 text-sm border bg-transparent" style={{ borderColor: "#1a1a1a" }}>
+          <option value="greenhouse">Greenhouse</option>
+          <option value="lever">Lever</option>
+        </select>
+      </div>
+      <div>
+        <label className="mono text-xs opacity-60 block mb-1">Slug</label>
+        <input value={slug} onChange={e => setSlug(e.target.value)} placeholder="e.g. anthropic" className="w-full px-2 py-1.5 text-sm border bg-transparent" style={{ borderColor: "#1a1a1a" }} />
+      </div>
+      <div>
+        <label className="mono text-xs opacity-60 block mb-1">Industry</label>
+        <select value={industry} onChange={e => setIndustry(e.target.value)} className="w-full px-2 py-1.5 text-sm border bg-transparent" style={{ borderColor: "#1a1a1a" }}>
+          {INDUSTRIES.map(i => <option key={i.id} value={i.id}>{i.label}</option>)}
+        </select>
+      </div>
+      <button onClick={submit} className="mono px-3 py-1.5 text-sm" style={{ background: "#1a1a1a", color: "#f5f1ea" }}>Add</button>
+      <p className="md:col-span-5 text-xs opacity-60 mt-1">
+        Find the slug in the board URL: <code>boards.greenhouse.io/<b>SLUG</b></code> · <code>jobs.lever.co/<b>SLUG</b></code>
+      </p>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<JobFinder />);
+</script>
+</body>
+</html>

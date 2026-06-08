@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aidan Connolly</title>
+<meta name="description" content="Aidan Connolly. Houston raised, BCG consultant, incoming Wharton MBA." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --paper: #f4f1ea;
+    --paper-warm: #ebe6dc;
+    --accent: #b8472a;
+    --accent-soft: #d4a574;
+    --rule: #d6cfc1;
+    --muted: #6b6358;
+    --serif: 'Fraunces', Georgia, serif;
+    --sans: 'Inter Tight', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 400;
+    line-height: 1.6;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(212, 165, 116, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(184, 71, 42, 0.05) 0%, transparent 40%);
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+  }
+  .container { max-width: 1240px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 2; }
+
+  nav { padding: 32px 0 0; display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--rule); padding-bottom: 24px; }
+  .logo { font-family: var(--serif); font-weight: 500; font-size: 22px; letter-spacing: -0.02em; font-style: italic; }
+  .nav-links { display: flex; gap: 36px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; }
+  .nav-links a { color: var(--ink); text-decoration: none; transition: color 0.3s; }
+  .nav-links a::before { content: '◦'; margin-right: 6px; color: var(--accent); }
+  .nav-links a:hover { color: var(--accent); }
+
+  .hero { padding: 90px 0 80px; border-bottom: 1px solid var(--rule); }
+  .hero-meta { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 40px; display: flex; gap: 20px; align-items: center; animation: fadeUp 0.8s ease forwards; }
+  .hero-meta::before { content: ''; width: 60px; height: 1px; background: var(--accent); }
+  h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(54px, 8.5vw, 120px); line-height: 0.95; letter-spacing: -0.04em; margin-bottom: 48px; animation: fadeUp 1s ease 0.1s backwards; }
+  h1 .italic { font-style: italic; font-weight: 400; color: var(--accent); }
+  .hero-narrative { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 40px; animation: fadeUp 1s ease 0.2s backwards; }
+  .hero-narrative p { font-family: var(--serif); font-size: 19px; font-weight: 300; line-height: 1.6; color: #2d2820; }
+  .hero-narrative p + p { margin-top: 20px; }
+  .hero-narrative .lead { font-size: 22px; font-style: italic; color: var(--ink); }
+  .hero-narrative .lead::first-letter { font-size: 64px; font-weight: 500; float: left; line-height: 0.85; margin: 4px 8px 0 0; color: var(--accent); font-style: normal; }
+
+  section { padding: 100px 0; border-bottom: 1px solid var(--rule); }
+  .section-header { display: grid; grid-template-columns: 200px 1fr; gap: 60px; margin-bottom: 64px; align-items: baseline; }
+  .section-num { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--accent); }
+  .section-title { font-family: var(--serif); font-size: clamp(40px, 5vw, 64px); font-weight: 400; letter-spacing: -0.03em; line-height: 1; }
+  .section-title em { font-style: italic; color: var(--muted); }
+
+  .experience-block { display: grid; grid-template-columns: 200px 1fr; gap: 60px; padding: 48px 0; border-top: 1px dashed var(--rule); }
+  .experience-block:first-child { border-top: none; padding-top: 0; }
+  .exp-meta { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); line-height: 1.8; }
+  .exp-meta strong { display: block; color: var(--ink); font-weight: 500; margin-bottom: 4px; }
+  .exp-content h3 { font-family: var(--serif); font-size: 32px; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .exp-role { font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--muted); margin-bottom: 20px; }
+  .exp-summary { font-size: 16px; line-height: 1.7; margin-bottom: 24px; max-width: 720px; }
+
+  .sub-experience { margin-top: 40px; padding: 28px 32px; background: var(--paper-warm); border-left: 3px solid var(--accent-soft); border-radius: 2px; }
+  .sub-experience .sub-tag { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 8px; }
+  .sub-experience h4 { font-family: var(--serif); font-size: 20px; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .sub-experience .sub-role { font-family: var(--serif); font-style: italic; font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+  .sub-experience p { font-size: 14px; line-height: 1.6; color: #2d2820; }
+
+  .case-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-top: 32px; }
+  .case-card { background: var(--paper-warm); padding: 28px; border-radius: 2px; transition: transform 0.4s ease, box-shadow 0.4s ease; border: 1px solid transparent; }
+  .case-card:hover { transform: translateY(-4px); border-color: var(--accent-soft); box-shadow: 0 20px 40px -20px rgba(184, 71, 42, 0.15); }
+  .case-tag { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 12px; }
+  .case-card h4 { font-family: var(--serif); font-size: 19px; font-weight: 500; line-height: 1.3; margin-bottom: 14px; letter-spacing: -0.01em; }
+  .case-card ul { list-style: none; font-size: 14px; line-height: 1.6; }
+  .case-card li { padding-left: 16px; position: relative; margin-bottom: 8px; color: #2d2820; }
+  .case-card li::before { content: '→'; position: absolute; left: 0; color: var(--accent); font-weight: 500; }
+  .case-card .highlight { color: var(--accent); font-weight: 500; }
+
+  .edu-card { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; padding: 40px 0; }
+  .edu-school h3 { font-family: var(--serif); font-size: 38px; font-weight: 400; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 12px; }
+  .edu-school h3 .italic { font-style: italic; color: var(--accent); }
+  .edu-degree { font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--muted); margin-bottom: 16px; }
+  .edu-stats { display: flex; gap: 32px; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--rule); flex-wrap: wrap; }
+  .stat .num { font-family: var(--serif); font-size: 36px; font-weight: 400; line-height: 1; letter-spacing: -0.02em; display: block; }
+  .stat .label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin-top: 6px; display: block; }
+
+  .edu-highlights { list-style: none; }
+  .edu-highlights li { padding: 14px 0; border-bottom: 1px dashed var(--rule); display: grid; grid-template-columns: 24px 1fr; gap: 12px; font-size: 14px; line-height: 1.5; }
+  .edu-highlights li:last-child { border-bottom: none; }
+  .edu-highlights .marker { font-family: var(--mono); font-size: 10px; color: var(--accent); padding-top: 2px; }
+  .edu-highlights strong { font-weight: 600; display: block; margin-bottom: 2px; }
+
+  .leadership-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .leader-card { padding: 32px 0; border-top: 2px solid var(--ink); }
+  .leader-card .icon { font-size: 28px; margin-bottom: 24px; display: block; }
+  .leader-card h4 { font-family: var(--serif); font-size: 22px; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 8px; line-height: 1.2; }
+  .leader-meta { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--muted); margin-bottom: 16px; }
+  .leader-card p { font-size: 14px; line-height: 1.6; color: #2d2820; }
+
+  .closing { display: grid; grid-template-columns: 280px 1fr; gap: 80px; }
+  .closing-block h4 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--accent); margin-bottom: 24px; }
+  .skill-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--rule); font-family: var(--serif); }
+  .skill-name { font-size: 18px; }
+  .skill-level { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+
+  .interest-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .interest-card { padding: 24px; border: 1px solid var(--rule); border-radius: 2px; background: rgba(255,255,255,0.3); transition: all 0.4s; }
+  .interest-card:hover { border-color: var(--accent-soft); transform: translateY(-2px); background: var(--paper-warm); }
+  .interest-card .glyph { font-size: 26px; line-height: 1; margin-bottom: 12px; }
+  .interest-card h5 { font-family: var(--serif); font-size: 19px; font-weight: 500; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .interest-card p { font-size: 14px; line-height: 1.55; color: #2d2820; }
+
+  .whats-next { text-align: center; padding: 100px 0 80px; border-bottom: 1px solid var(--rule); }
+  .whats-next .label { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--accent); margin-bottom: 24px; }
+  .whats-next h2 { font-family: var(--serif); font-size: clamp(36px, 5.5vw, 68px); font-weight: 300; line-height: 1.1; letter-spacing: -0.03em; max-width: 880px; margin: 0 auto 32px; }
+  .whats-next h2 em { font-style: italic; color: var(--accent); }
+  .whats-next p { font-family: var(--serif); font-size: 19px; font-weight: 300; color: var(--muted); max-width: 640px; margin: 0 auto 40px; line-height: 1.6; }
+  .cta-button { display: inline-block; font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.18em; padding: 18px 36px; background: var(--ink); color: var(--paper); text-decoration: none; border-radius: 2px; transition: all 0.3s; border: 1px solid var(--ink); }
+  .cta-button:hover { background: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+
+  footer { padding: 60px 0 40px; text-align: center; }
+  .contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; max-width: 720px; margin: 0 auto; }
+  .contact-item { text-align: center; }
+  .contact-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--muted); margin-bottom: 8px; }
+  .contact-value { font-family: var(--serif); font-size: 17px; color: var(--ink); text-decoration: none; transition: color 0.3s; }
+  .contact-value:hover { color: var(--accent); }
+  .footer-mark { margin-top: 60px; font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--muted); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    .container { padding: 0 24px; }
+    .hero { padding: 60px 0 50px; }
+    .hero-narrative { grid-template-columns: 1fr; gap: 24px; }
+    .section-header { grid-template-columns: 1fr; gap: 16px; margin-bottom: 40px; }
+    .experience-block { grid-template-columns: 1fr; gap: 24px; padding: 32px 0; }
+    .case-grid { grid-template-columns: 1fr; }
+    .edu-card { grid-template-columns: 1fr; gap: 32px; }
+    .leadership-grid { grid-template-columns: 1fr; }
+    .closing { grid-template-columns: 1fr; gap: 48px; }
+    .interest-grid { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; gap: 24px; }
+    .nav-links { gap: 18px; font-size: 10px; }
+    section { padding: 60px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <nav>
+    <div class="logo">A. Connolly</div>
+    <div class="nav-links">
+      <a href="#experience">Experience</a>
+      <a href="#education">Education</a>
+      <a href="#leadership">Outside</a>
+      <a href="#next">Get in touch</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-meta">
+      <span>Houston, TX</span>
+      <span>·</span>
+      <span>Philadelphia, PA · 2026</span>
+    </div>
+    <h1>Aidan<br>Conn<span class="italic">o</span>lly.</h1>
+
+    <div class="hero-narrative">
+      <div>
+        <p class="lead">
+          Houston raised, headed to Wharton, looking to build on the strategy skills I developed at BCG.
+        </p>
+        <p>
+          I grew up in Houston my entire life, then went to <strong>Indiana University</strong> to pursue business at the Kelley School. I chose <strong>BCG</strong> after graduation for the optionality and the breadth of skills I could build, generalist by design, sponge by default.
+        </p>
+      </div>
+      <div>
+        <p>
+          I'm now headed to <strong>Wharton</strong> to turn the strategic muscle I built at BCG into operational know-how, and to experiment inside one of the most rigorous academic environments in the world.
+        </p>
+        <p>
+          The honest goal: find what I'm genuinely passionate about while I'm there, and pursue it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="experience" class="reveal">
+    <div class="section-header">
+      <div class="section-num">[ 01 ] Experience</div>
+      <h2 class="section-title">A few projects I've <em>worked on.</em></h2>
+    </div>
+
+    <div class="experience-block">
+      <div class="exp-meta">
+        <strong>2023 to Present</strong>
+        Houston, TX
+      </div>
+      <div class="exp-content">
+        <h3>Boston Consulting Group</h3>
+        <div class="exp-role">Consultant · Associate (2023 to 2025)</div>
+        <p class="exp-summary">
+          Twelve projects so far across Healthcare, Principal Investors / Private Equity, and Public Sector. A few selected cases below.
+        </p>
+
+        <div class="case-grid">
+
+          <div class="case-card">
+            <div class="case-tag">Public Sector · Operations</div>
+            <h4>Navy Shipyard Throughput Optimization</h4>
+            <ul>
+              <li>Helped implement a production planning tool that lifted workforce productivity <span class="highlight">62% on a $7B investment</span></li>
+              <li>Supported end-to-end change management with frontline adoption plans and weekly executive engagement</li>
+              <li>Streamlined data retrieval to cut weekly executive reporting from <span class="highlight">6 hours to 10 minutes</span></li>
+            </ul>
+          </div>
+
+          <div class="case-card">
+            <div class="case-tag">Healthcare · Sell-Side Diligence</div>
+            <h4>Healthcare Tech Due Diligence & Market Research</h4>
+            <ul>
+              <li>Ran 50+ customer interviews and synthesized findings into a 50-page diligence section informing a <span class="highlight">$500M sale</span></li>
+              <li>Sized 6 value creation opportunities that shaped the buyer's growth thesis</li>
+              <li>Mapped competitive landscape to clarify the target's unique value proposition</li>
+            </ul>
+          </div>
+
+          <div class="case-card">
+            <div class="case-tag">Industrials · Trading Strategy</div>
+            <h4>Petrochemical Trading Org Design</h4>
+            <ul>
+              <li>Helped build three commodity trading models that generated <span class="highlight">$15M risk-free gains, 80%+ ROI</span></li>
+              <li>Built a business case to expand into six new commodities, enabling a $5M follow-on engagement</li>
+              <li>Supported design of a 5-year trading org plan: structure, talent, and culture for revenue growth</li>
+            </ul>
+          </div>
+
+          <div class="case-card">
+            <div class="case-tag">Pharma · GenAI Strategy</div>
+            <h4>Pharmaceuticals GenAI Benchmarking</h4>
+            <ul>
+              <li>Benchmarked tech capabilities vs. peers to inform a <span class="highlight">$25M GenAI rollout</span></li>
+              <li>Surveyed Finance teams, surfacing 35%+ potential productivity gains from GenAI augmentation</li>
+              <li>Designed executive workshops to co-create 26 GenAI use cases and an adoption roadmap</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div class="sub-experience">
+          <div class="sub-tag">Earlier · Summer 2022</div>
+          <h4>BCG Summer Associate Intern</h4>
+          <div class="sub-role">Telecommunications client · HVAC Optimization & Anomaly Analysis</div>
+          <p>
+            Helped establish an anomaly-detection system for HVAC operations that surfaced <strong>~$40M in annual potential energy savings</strong>. Built baseline energy models for client-wide efficiency benchmarking and identified inefficiency patterns across 800+ facilities.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="experience-block">
+      <div class="exp-meta">
+        <strong>Summer 2021</strong>
+        Chicago, IL
+      </div>
+      <div class="exp-content">
+        <h3>NextGen Growth Partners</h3>
+        <div class="exp-role">Private Equity Summer Analyst</div>
+        <p class="exp-summary">
+          Assessed an IT logistics acquisition target with market analysis and risk review supporting a <strong>$50M investment decision</strong>. Presented a 10-page investment thesis on the food testing and inspection industry to the investment committee. Evaluated 100+ acquisition opportunities that fed into 4 board-level pitches.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="education" class="reveal">
+    <div class="section-header">
+      <div class="section-num">[ 02 ] Education</div>
+      <h2 class="section-title">From <em>Bloomington</em> to <em>Philly.</em></h2>
+    </div>
+
+    <div class="edu-card">
+      <div class="edu-school">
+        <h3>The Wharton <span class="italic">School</span></h3>
+        <div class="edu-degree">MBA Candidate · Incoming</div>
+        <p style="color: var(--muted); font-family: var(--serif); font-size: 17px;">
+          University of Pennsylvania · Philadelphia, PA
+        </p>
+        <div class="edu-stats">
+          <div class="stat">
+            <span class="num">~60%</span>
+            <span class="label">Merit Scholarship</span>
+          </div>
+          <div class="stat">
+            <span class="num">695</span>
+            <span class="label">GMAT (98th %ile)</span>
+          </div>
+        </div>
+      </div>
+      <div></div>
+    </div>
+
+    <div class="edu-card" style="border-top: 1px dashed var(--rule); padding-top: 60px;">
+      <div class="edu-school">
+        <h3>Indiana <span class="italic">University</span></h3>
+        <div class="edu-degree">Kelley School of Business · 2019 to 2023</div>
+        <p style="color: var(--muted); font-family: var(--serif); font-size: 17px;">
+          B.S. in Business · Finance & International Business
+        </p>
+        <div class="edu-stats">
+          <div class="stat">
+            <span class="num">3.90</span>
+            <span class="label">Cumulative GPA</span>
+          </div>
+          <div class="stat">
+            <span class="num">Honors</span>
+            <span class="label">Hutton Honors College</span>
+          </div>
+          <div class="stat">
+            <span class="num">2</span>
+            <span class="label">Student Orgs Started</span>
+          </div>
+        </div>
+      </div>
+
+      <ul class="edu-highlights">
+        <li>
+          <span class="marker">01</span>
+          <div>
+            <strong>President & Founder, PE/VC Club</strong>
+            Built a 150+ member organization with industry-leader sessions and case reviews.
+          </div>
+        </li>
+        <li>
+          <span class="marker">02</span>
+          <div>
+            <strong>VP & Co-Founder, Financial Investment Review Club</strong>
+            Selective 60-member club with custom diligence and research training.
+          </div>
+        </li>
+        <li>
+          <span class="marker">03</span>
+          <div>
+            <strong>International Case Competition Team</strong>
+            Selected 1 of 40 from 250+ for a competitive consulting program.
+          </div>
+        </li>
+        <li>
+          <span class="marker">04</span>
+          <div>
+            <strong>Kelley Leadership Summit</strong>
+            Recognized as a top 50 student leader, two consecutive years.
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="leadership" class="reveal">
+    <div class="section-header">
+      <div class="section-num">[ 03 ] Outside Work</div>
+      <h2 class="section-title">Community <em>& craft.</em></h2>
+    </div>
+
+    <div class="leadership-grid">
+      <div class="leader-card">
+        <span class="icon">◐</span>
+        <h4>BCG Houston GenAI Lead</h4>
+        <div class="leader-meta">2024 to Present</div>
+        <p>
+          Lead office GenAI adoption with monthly seminars on consulting use cases. Office liaison for BCG's broader GenAI strategy, supporting tool rollouts for 300+ consultants locally.
+        </p>
+      </div>
+
+      <div class="leader-card">
+        <span class="icon">◑</span>
+        <h4>Captain, BCG Houston Soccer</h4>
+        <div class="leader-meta">2025 to Present</div>
+        <p>
+          Organize biweekly practices around Houston, coordinate with office leadership on budget. Plan the annual Southwest system sports tournament.
+        </p>
+      </div>
+
+      <div class="leader-card">
+        <span class="icon">◒</span>
+        <h4>Houston Food Bank Volunteer</h4>
+        <div class="leader-meta">2023</div>
+        <p>
+          Pro-bono consulting with senior execs on GenAI use cases across functions. Six hours each weekend on the assembly line for hands-on process improvement.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <div class="section-header">
+      <div class="section-num">[ 04 ] Toolkit & Personal</div>
+      <h2 class="section-title">What I <em>use</em> & a bit <em>about me.</em></h2>
+    </div>
+
+    <div class="closing">
+      <div class="closing-block">
+        <h4>Skills</h4>
+        <div class="skill-row">
+          <span class="skill-name">Excel</span>
+          <span class="skill-level">Expert</span>
+        </div>
+        <div class="skill-row">
+          <span class="skill-name">Tableau</span>
+          <span class="skill-level">Intermediate</span>
+        </div>
+        <div class="skill-row">
+          <span class="skill-name">VBA</span>
+          <span class="skill-level">Beginner</span>
+        </div>
+      </div>
+
+      <div class="closing-block">
+        <h4>A Little More About Me</h4>
+        <div class="interest-grid">
+
+          <div class="interest-card">
+            <div class="glyph">⚽</div>
+            <h5>Soccer for life</h5>
+            <p>Manchester United supporter through all the highs and (mostly recent) lows. Captain of the BCG Houston squad.</p>
+          </div>
+
+          <div class="interest-card">
+            <div class="glyph">🏎️</div>
+            <h5>Formula 1</h5>
+            <p>Mercedes fan through every era. Currently all in on Antonelli, the future of the sport is in good hands.</p>
+          </div>
+
+          <div class="interest-card">
+            <div class="glyph">🌎</div>
+            <h5>50+ countries & counting</h5>
+            <p>Travel planning is a hobby unto itself. I'd rather build the spreadsheet than skip it.</p>
+          </div>
+
+          <div class="interest-card">
+            <div class="glyph">☘️</div>
+            <h5>~120 Irish cousins</h5>
+            <p>Yes, really. The family reunion logistics are non-trivial. Houston raised, but the roots run deep.</p>
+          </div>
+
+          <div class="interest-card">
+            <div class="glyph">🇵🇪</div>
+            <h5>Peruvian grandmother</h5>
+            <p>Where my love for Latin cuisine comes from. Lomo saltado is a religion in my house.</p>
+          </div>
+
+          <div class="interest-card">
+            <div class="glyph">📖</div>
+            <h5>Single-sitting reader</h5>
+            <p>I've finished ~750-page novels in one sitting. Couch, full day, no other plans. Highly recommend.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="next" class="whats-next reveal">
+    <div class="label">What's Next</div>
+    <h2>If any of this is <em>interesting</em> to you, I'd love to talk.</h2>
+    <p>
+      Whether it's MBA recruiting, an idea you're working on, or a good conversation about strategy, investing, or the latest at Manchester United, please reach out.
+    </p>
+    <a href="mailto:aidanlconnolly@gmail.com?subject=Hello from your website" class="cta-button">
+      Get in touch
+    </a>
+  </section>
+
+  <footer>
+    <div class="contact-grid">
+      <div class="contact-item">
+        <div class="contact-label">Email</div>
+        <a href="mailto:aidanlconnolly@gmail.com" class="contact-value">aidanlconnolly@gmail.com</a>
+      </div>
+      <div class="contact-item">
+        <div class="contact-label">Phone</div>
+        <a href="tel:8325441217" class="contact-value">832 · 544 · 1217</a>
+      </div>
+      <div class="contact-item">
+        <div class="contact-label">Based in</div>
+        <span class="contact-value">Houston · Philadelphia</span>
+      </div>
+    </div>
+    <div class="footer-mark">Made by hand, 2026</div>
+  </footer>
+
+</div>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
