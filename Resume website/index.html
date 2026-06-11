@@ -149,6 +149,7 @@
 
   @media (max-width: 900px) {
     .container { padding: 0 24px; }
+    nav { flex-wrap: wrap; gap: 16px; }
     .hero { padding: 60px 0 50px; }
     .hero-narrative { grid-template-columns: 1fr; gap: 24px; }
     .section-header { grid-template-columns: 1fr; gap: 16px; margin-bottom: 40px; }
@@ -159,8 +160,27 @@
     .closing { grid-template-columns: 1fr; gap: 48px; }
     .interest-grid { grid-template-columns: 1fr; }
     .contact-grid { grid-template-columns: 1fr; gap: 24px; }
-    .nav-links { gap: 18px; font-size: 10px; }
+    .nav-links { gap: 18px; font-size: 10px; flex-wrap: wrap; }
     section { padding: 60px 0; }
+  }
+
+  @media (max-width: 480px) {
+    .container { padding: 0 20px; }
+    nav { padding-bottom: 18px; }
+    .hero { padding: 44px 0 40px; }
+    .hero-meta { gap: 12px; margin-bottom: 28px; flex-wrap: wrap; }
+    h1 { font-size: clamp(40px, 13vw, 56px); margin-bottom: 32px; }
+    .hero-narrative p { font-size: 17px; }
+    .hero-narrative .lead { font-size: 19px; }
+    .hero-narrative .lead::first-letter { font-size: 52px; }
+    section { padding: 48px 0; }
+    .exp-content h3 { font-size: 26px; }
+    .sub-experience { padding: 22px 20px; }
+    .edu-school h3 { font-size: 30px; }
+    .edu-stats { gap: 24px; }
+    .stat .num { font-size: 30px; }
+    .leader-card h4 { font-size: 20px; }
+    .cta-button { padding: 16px 28px; }
   }
 </style>
 </head>
