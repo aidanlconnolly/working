@@ -73,3 +73,6 @@
 [submodule "travel-app"]
 	path = travel-app
 	url = https://github.com/aidanlconnolly/travel-app.git
+[submodule "PeOps-Prep"]
+	path = PeOps-Prep
+	url = https://github.com/aidanlconnolly/peops-prep.git

@@ -9,6 +9,7 @@ This is a collection of independent web projects, each in its own subfolder. The
 | Project | Stack | Entry point |
 |---|---|---|
 | Amex Credits Maximizer | React 19 + TS 6 + Vite 8 + Tailwind v4 | `src/` |
+| behavioral-prep | Next.js 16 + React 19 + shadcn/ui + Drizzle (libSQL) + ts-fsrs + Anthropic SDK | `app/` (port 5960) — STAR story bank for MBA behavioral interview prep, auth |
 | Dream Career Picker | Python/Flask + Vercel Edge | `server.py` / `api/careers.js` |
 | Foundry | Next.js 16 + React 19 + Drizzle (libSQL) + Anthropic SDK + MDX | `app/` (own `README.md`, port 5900) — "zero to scale" startup learning app, auth |
 | Golf range | Vanilla HTML/Canvas | `index.html` (open directly) |
@@ -22,6 +23,7 @@ This is a collection of independent web projects, each in its own subfolder. The
 | Learn Claude Code | Vanilla HTML | `index.html` (open directly) |
 | personal-finance-tracker | React 18 + TS + Vite + Tailwind | `src/` |
 | Personal Doctor | React 18 + TS + Vite + Tailwind + Recharts + Vercel Edge | `src/` / `api/analyze.js` |
+| PeOps-Prep | Next.js 16 + React 19 + shadcn/ui + Drizzle (libSQL) + ts-fsrs + Anthropic SDK | `app/` (own `CLAUDE.md`, port 5550) — PE portfolio-ops interview prep, FSRS + quizzes + AI-graded cases, per-user auth |
 | PGA Championship Tracker | React 18 + TS + Vite + Tailwind | `src/` |
 | Post-MBA Career Explorer | React 18 + TS + Vite + Tailwind | `src/` (data in `src/data/careers.ts`) |
 | Penalty shootout | Vanilla HTML/SVG + Vercel KV | `index.html` (open directly) |
@@ -55,7 +57,7 @@ PATH=/opt/homebrew/bin:$PATH npm install      # install deps
 
 Preview ports: `amex-credits` → 5175, `pga-tracker` → 5173, `finance-tracker` → 5174, `personal-doctor` → 5177, `stadium-run` → 5350, `career-explorer` → 5250.
 
-**Next.js projects** (italian-tutor, language-tutor, foundry) — `npm run dev` (Next dev server), `npm run build`, `npm run lint`. Use Drizzle ORM over libSQL and **per-user email/password auth** (jose JWT + bcryptjs, `proxy.ts` route guard); see each project's own `CLAUDE.md`/`AGENTS.md`/`README.md`. Ports: `italian-tutor` → 5600, `language-tutor` → 5620 (combined Italian+French, dark-slate login, `[lang]` routing), `foundry` → 5900 (startup learning app — MDX curriculum + Anthropic AI mentor/VC-tracker; for local dev `TURSO_DATABASE_URL=file:local.db` works).
+**Next.js projects** (italian-tutor, language-tutor, foundry, PeOps-Prep, behavioral-prep) — `npm run dev` (Next dev server), `npm run build`, `npm run lint`. Use Drizzle ORM over libSQL; the tutor apps + foundry + behavioral-prep + PeOps-Prep use **per-user email/password auth** (jose JWT + bcryptjs, `proxy.ts` route guard); see each project's own `CLAUDE.md`/`AGENTS.md`/`README.md`. Ports: `italian-tutor` → 5600, `language-tutor` → 5620 (combined Italian+French, dark-slate login, `[lang]` routing), `foundry` → 5900 (startup learning app — MDX curriculum + Anthropic AI mentor/VC-tracker; for local dev `TURSO_DATABASE_URL=file:local.db` works), `PeOps-Prep` → 5550 (PE portfolio-ops interview prep — Tailwind v4 + **shadcn/ui**, ts-fsrs spaced repetition, quiz engine, AI-graded cases; per-user auth — `lib/user.ts`'s `currentUserId()` is now async, returning `requireAuth()`; `file:local.db` for dev), `behavioral-prep` → 5960 (STAR story bank for MBA behavioral recruiting — stories ↔ seeded 84-question bank with per-pairing "angle" notes, company/industry Targets with per-target answers, FSRS practice decks, AI story coach + question matcher; auth; `file:local.db` for dev — note `TURSO_AUTH_TOKEN` must be non-empty even for the file DB).
 
 **Shared scripts** (`_scripts/`): `add-auth.sh` scaffolds the italian-tutor auth pattern (session lib, login/register/account pages, route guard) into *another* Next.js App Router + Drizzle/Turso app, then prints the manual per-schema steps. It does **not** apply to Flask, vanilla-HTML, or localStorage-only React apps — those store progress per-browser already (no shared backend to gate). Read the script header before running.
 
@@ -77,11 +79,12 @@ All deployed projects use **Vercel** via GitHub auto-deploy (push to `main` → 
 - **Dream Career Picker**: dual-target — Flask for local, Vercel Edge (`api/careers.js`) for production. `index.html` and `public/index.html` are identical; keep both in sync when editing the UI. Same for the Claude prompt in `server.py:build_prompt()` and `api/careers.js:buildPrompt()`.
 - **World Cup Bracket Picker**: Flask for local; `api/simulate.py` and `api/final.py` are Vercel Python serverless functions for production.
 - **PGA Championship Tracker**: Vite build → `dist/` → Vercel SPA (rewrite `/* → /index.html`).
+- **behavioral-prep**: Next.js → Vercel at `behavioral-prep.vercel.app` (project `behavioral-prep`, GitHub `aidanlconnolly/behavioral-prep` auto-deploy). Own Turso DB `behavioral-prep`. Env: `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `AUTH_SECRET`, `ANTHROPIC_API_KEY` (optional — AI coach/matcher hide without it).
 - **Santorini website**: source is `santorini.html` here; deploy by copying to `/tmp/santorini-guide/index.html`, then committing to the `aidanlconnolly/santorini-guide` repo.
 
 ## Preview server
 
-`.claude/launch.json` in this working directory configures the Claude Code preview tool. Current entries: `World Cup Bracket` (3000), `pga-tracker` (5173), `finance-tracker` (5174), `amex-credits` (5175), `personal-doctor` (5177), `tower-defense` (5200), `penalty-shootout` (5300), `stadium-run` (5350), `travel-app` (5400), `learn-claude-code` (5500), `italian-tutor` (5600), `rankings` (5700), `history-platform` (5750), `golf-swing` (5800), `famous-quotes` (5850), `foundry` (5900). Add new entries here when a project needs a preview server. Note: a couple of entries serve from `/tmp` (`rankings`, `stadium-run`) — those are scratch preview copies, not the source of truth.
+`.claude/launch.json` in this working directory configures the Claude Code preview tool. Current entries: `World Cup Bracket` (3000), `pga-tracker` (5173), `finance-tracker` (5174), `amex-credits` (5175), `personal-doctor` (5177), `tower-defense` (5200), `penalty-shootout` (5300), `stadium-run` (5350), `travel-app` (5400), `learn-claude-code` (5500), `italian-tutor` (5600), `rankings` (5700), `history-platform` (5750), `golf-swing` (5800), `famous-quotes` (5850), `foundry` (5900), `peops-prep` (5550). Add new entries here when a project needs a preview server. Note: a couple of entries serve from `/tmp` (`rankings`, `stadium-run`) — those are scratch preview copies, not the source of truth.
 
 ## Chrome extensions (`Google extensions/`)
 

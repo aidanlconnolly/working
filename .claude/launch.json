@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "date-app",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-c", "import sys,os; os.chdir('/Users/aidanconnolly/Desktop/Projects/Working/date-app'); sys.path=[p for p in sys.path if p]; import functools,http.server,socketserver; h=functools.partial(http.server.SimpleHTTPRequestHandler,directory='/Users/aidanconnolly/Desktop/Projects/Working/date-app'); socketserver.TCPServer(('',5950),h).serve_forever()"],
+      "port": 5950
+    },
+    {
       "name": "World Cup Bracket",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["World Cup Bracket Picker/server.py"],
@@ -9,15 +15,21 @@
     },
     {
       "name": "pga-tracker",
-      "runtimeExecutable": "/opt/homebrew/bin/node",
-      "runtimeArgs": ["PGA Championship Tracker/node_modules/.bin/vite", "--port", "5173"],
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd 'PGA Championship Tracker' && /opt/homebrew/bin/node node_modules/.bin/vite --port 5173"],
       "port": 5173
     },
     {
       "name": "tower-defense",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["Tower defense game/server.py"],
+      "runtimeExecutable": "/opt/homebrew/bin/node",
+      "runtimeArgs": ["/tmp/cc-static-server.js", "/Users/aidanconnolly/Desktop/Projects/Working/Tower defense game", "5200"],
       "port": 5200
+    },
+    {
+      "name": "resume-website",
+      "runtimeExecutable": "/opt/homebrew/bin/node",
+      "runtimeArgs": ["/tmp/cc-static-server.js", "/Users/aidanconnolly/Desktop/Projects/Working/Resume website", "5450"],
+      "port": 5450
     },
     {
       "name": "startup-ideas",
@@ -126,6 +138,18 @@
       "runtimeExecutable": "/bin/bash",
       "runtimeArgs": ["-c", "cd looper-golf && PATH=/opt/homebrew/bin:$PATH npx expo start --web --port 8082"],
       "port": 8082
+    },
+    {
+      "name": "peops-prep",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd PeOps-Prep && /opt/homebrew/bin/node node_modules/.bin/next dev --port 5550"],
+      "port": 5550
+    },
+    {
+      "name": "behavioral-prep",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "cd behavioral-prep && /opt/homebrew/bin/node node_modules/.bin/next dev --port 5960"],
+      "port": 5960
     }
   ]
 }
